@@ -1,3 +1,3 @@
-TRAINING_FILE = "../input/train_folds.csv"
+TRAINING_FILE = "input/train_folds.csv"
 
-MODEL_OUTPUT = "../models/"
+MODEL_OUTPUT = "models/"

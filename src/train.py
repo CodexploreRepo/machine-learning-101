@@ -2,7 +2,7 @@ import joblib
 import os 
 import argparse
 
-import config, model_dispatcher
+from . import config, model_dispatcher
 
 import pandas as pd
 from sklearn import metrics
@@ -15,11 +15,11 @@ def run(fold, model):
     df_train = df[df.kfold != fold].reset_index(drop = True)
     df_valid = df[df.kfold == fold].reset_index(drop = True)
     
-    x_train = df_train.drop("quality", axis = 1).values
-    y_train = df_train["quality"].values
+    x_train = df_train.drop("target", axis = 1).values
+    y_train = df_train["target"].values
     
-    x_valid = df_valid.drop("quality", axis = 1).values
-    y_valid = df_valid["quality"].values
+    x_valid = df_valid.drop("target", axis = 1).values
+    y_valid = df_valid["target"].values
     
     #Fetch the model from model_dispatcher
     clf =  model_dispatcher.models[model]

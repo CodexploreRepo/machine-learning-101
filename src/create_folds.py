@@ -30,6 +30,6 @@ def create_folds(df, target_col, regression=False):
     df.to_csv("../input/train_folds.csv", index=False)
 
 if __name__ == "__main__":
-    df = pd.read_csv("../input/dataset/winequality-red.csv")
+    df = pd.read_csv("../input/dataset/cat_train.csv")
     
-    create_folds(df, "quality")
+    create_folds(df, "target")
