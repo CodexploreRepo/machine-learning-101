@@ -17,3 +17,4 @@ train_df = train_df.reindex(np.random.permutation(train_df.index))
 # Project
 
 - [Mobile Price Classification](https://www.kaggle.com/iabhishekofficial/mobile-price-classification)
+- [Online Retail](https://github.com/marcellusruben/Online-Retail-Data-Science)
