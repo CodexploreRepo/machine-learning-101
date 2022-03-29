@@ -18,3 +18,6 @@ train_df = train_df.reindex(np.random.permutation(train_df.index))
 
 - [Mobile Price Classification](https://www.kaggle.com/iabhishekofficial/mobile-price-classification)
 - [Online Retail](https://github.com/marcellusruben/Online-Retail-Data-Science)
+
+# Resources
+- [DataScience Stack Exchange](https://datascience.stackexchange.com/)
