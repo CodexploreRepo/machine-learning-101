@@ -22,3 +22,4 @@ train_df = train_df.reindex(np.random.permutation(train_df.index))
 
 # Resources
 - [DataScience Stack Exchange](https://datascience.stackexchange.com/)
+- [Visual Analytics](https://isss608-ay2021-22t2.netlify.app/lesson.html?fbclid=IwAR2SDOEkOj0S4RGHl0-t6wgNREGQ6kdar5V1T0H-45OokSedGpKPKdGMs0M)
