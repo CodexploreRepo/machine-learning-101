@@ -1,4 +1,13 @@
-#Optimization
+category_encoders>=2.6.2
+ipykernel
+# Optimization
 scikit_optimize #skopt module
 hyperopt 
 optuna
+# Model
+xgboost
+matplotlib
+seaborn
+plotly
+shap
+jupyter

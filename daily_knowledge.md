@@ -1,11 +1,17 @@
 # Machine Learning 101
 
 ## Day 1
-
+### Dimensionality Reduction Techniques
+- PCA
+- t-SNE
+- MCA
 ### Data Pre-processing
+#### Scaler
+- Min Max Scaler
+- PowerTransformer
 
+- Note: NO need to scale those are One-Hot encoded
 #### Categorical Feature
-
 ##### Rare Category
 
 - A **rare category** is a category which is not seen very often, or a new category that is not present in train
