@@ -1,5 +1,4 @@
 # Machine Learning 101
-
 ## Day 1
 ### Dimensionality Reduction Techniques
 - PCA
@@ -20,6 +19,13 @@
 
 ### Model Training
 
+#### Regression
+- Target variable: as the y has a wide range, so better to convert to log scale before training
+```Python
+y_train = np.log1p(df_train.price.values)
+y_val   = np.log1p(df_val.price.values)
+y_test  = np.log1p(df_test.price.values)
+```
 #### Binary Classification
 
 - If the target is **skewed** (class 0 dominates class 1) &#8594; the best metric for this binary classification problem would be `Area Under the ROC Curve (AUC)``.

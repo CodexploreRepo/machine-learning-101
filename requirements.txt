@@ -11,3 +11,4 @@ seaborn
 plotly
 shap
 jupyter
+beautifulsoup4
