@@ -1,4 +1,17 @@
 # Machine Learning 101
+
+## Day 2
+### Scikit-learn
+- `.fit()`, `.transform()`, `.predict()` needs to provide as `[[1], [2], [1], ..]` format
+  - Solution: 
+    - **Method 1** using reshape: `[1,2,1].reshape(-1, 1)` or `ohe.fit_transform(df['col'].values.reshape(-1, 1))`
+    - **Method 2** using `[[]]`: `model.fit(df[['col']].values)`
+- `UserWarning: X does not have valid feature names, but IsolationForest was fitted with feature name`
+  - Root Cause: this happens when we `.fit()`the model/encoder/sklearn object with DataFrame, but when we `.predict()` with Numpy array
+  - Solution: `.fit(df.values)` so that we will provide to the sklearn object the Numpy array
+### Numpy
+- Convert sparse matrix (only store position of where has value != 0) to dense: `sparse_matrix.to_array()`
+  - FYI: the matrix returns after one-hot encoding is a spare matrix
 ## Day 1
 ### Dimensionality Reduction Techniques
 - PCA

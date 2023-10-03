@@ -1,5 +1,7 @@
 # Advanced Machine Learning
-
+## Data Pre-processing
+- [Categorical Encoding](./docs/categorical_encoding.md)
+## Model Training
 - [Model Training](./docs/model_training.md)
 - [Hyperparameter Tuning](./docs/hyperparameter_tuning.md)
 
