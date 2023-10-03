@@ -1,6 +1,25 @@
 # Machine Learning 101
 
 ## Day 2
+### Pandas
+- `pd.cut` to divide the data into multiple range
+```Python
+# If right == True (the default), then the bins [1, 2, 10**6, float('inf')] 
+#                              indicate (1,2], (2,3], (10**6, float('inf')]. 
+# This argument is ignored when bins is an IntervalIndex.
+mapping = pd.cut(make_df['mean'], [0, 10**4, 2.5*(10**4), 3.6*(10**4), 5.5*(10**4), 10**5, 10**6, float('inf')], 
+        labels=['low', ' mid-1', 'mid-2', 'high-class', 'luxury' ,'super luxury', 'exotic'], right=True)
+
+# make_category = {
+#     'exotic': (10**6, float('inf')],
+#     'super luxury': (10**5, 10**6],
+#     'luxury': (5.5*(10**4), 10**5],
+#     'high-class': (3.6*(10**4), 5.5*(10**4)],
+#     'mid-2': (2.5*(10**4), 3.6*(10**4)],
+#     'mid-1': (10**4, 2.5*(10**4)],
+#     'low'  : (0, 10**4]
+# }
+```
 ### Scikit-learn
 - `.fit()`, `.transform()`, `.predict()` needs to provide as `[[1], [2], [1], ..]` format
   - Solution: 
