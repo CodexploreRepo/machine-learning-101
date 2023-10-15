@@ -201,7 +201,7 @@ encoder.transform(data_test["type"])
 - Hash encoding can be done with `FeatureHasher` from the **sklearn** package or with `HashingEncoder` from the **category encoders** package.
 
 ```Python
-rom sklearn.feature_extraction import FeatureHasher
+from sklearn.feature_extraction import FeatureHasher
 
 # Hash Encoding - fit on training data, transform test data
 encoder = FeatureHasher(n_features=2, input_type="string")
