@@ -16,13 +16,18 @@
 # below code is to find those categories in col "ord_4" which have the count less then 2000, and assign them to the same category "rare"
 df.loc[df["ord_4"].map(df["ord_4"].value_counts()) < 2000, "ord_4"] = "RARE"
 ```
+- The map on how to determine which encoder we should use
+
+<p align="center"><img src='../assets/img/categorical-encoding-flowchart.png'></p>
+
 ## Type of Encoders
 
-| Encoder              | Type of Variable | Support High Cardinality | Handle Unseen |
-| :------------------- | :--------------: | :----------------------: |:-------------:|
-| Label Encoding       |   Nominal        |     Yes                  | No            |
-| Ordinal Encoding     |   Ordinal        |     Yes                  | Yes           |
-| One-Hot Encoding     |   Nominsl        |     Not                  | Yes           |
+| Encoder              | Type of Variable | Support High Cardinality | Handle Unseen | Task |
+| :------------------- | :--------------: | :----------------------: |:-------------:|:-------------:|
+| Label Encoding       |   Nominal        |     Yes                  | No            |      |
+| Ordinal Encoding     |   Ordinal        |     Yes                  | Yes           |      |
+| One-Hot Encoding     |   Nominal        |     Not                  | Yes           |      |
+| Target Encoding / Leave One Out Encoding | Nominal | Yes                    | Yes           | Only Classification   |
 
 ## Label Encoding / Ordinal Encoding
 - **Label Encoder** is used for *nominal* categorical variables (categories without order i.e., red, green, blue)
@@ -79,3 +84,59 @@ data_ohe.columns = [col for col in ohe.categories_[0]]
 ohe.transform([['Unseen']]).toarray()
 #     array([[0.,  0.,       0.,   0.,        0.,    0.,   0.]])
 ```
+
+## Target Encoding / Leave One Out Encoding
+- Target Encoding uses Bayesian posterior probability to encode categorical variables to the mean of the target variable (numerical variable). 
+- There are two ways to implement target encoding
+    - **Mean Encoding**: The encoded values are the mean of the target values with smoothing applied
+    - **Leave-One-Out Encoding**: The encoded values are the mean of the target values except for the data point that we want to predict
+### Target (Mean) Encoding 
+- Example: we want to encode **"Favorite Color"** column with the target column **"Loves Troll 2"**
+<p align="center"><img src='../assets/img/target_encoder_1.png'></p>
+
+- From above example, because less data supports the value Red (only 1 record), so we have less confidently placed the encoded value for Red in compare with Blue and Green
+- The solution for this is **Weigthed Mean** with the smoothing `m`
+<p align="center"><img src='../assets/img/target_encoder_2.png'></p>
+
+- Code Implementation
+```Python
+import category_encoders as ce
+
+# Target (Mean) Encoding - fit on training data, transform test data
+encoder = ce.TargetEncoder(cols=["ord_2"], smoothing=1.0)
+df["ord_2_encoded"] = encoder.fit_transform(df["ord_2"], df["target"])
+
+```
+#### Cons of Target Encoder
+- *Target Leakage*: Even with smoothing, this may result in target leakage and overfitting. Leave-One-Out Encoding and introducing Gaussian noise in the target variable can be used to address the overfitting problem
+- *Uneven Category Distribution*: The category distribution can differ in train and validation/test data and result in categories being encoded with incorrect or extreme values
+
+### Leave One Out Encoding
+- In the leave one out encoding, the current target value is reduced from the overall mean of the target to avoid leakage.
+- For example, we want to encode the column `ord_2` and we have 
+    - At the index 0, the `ord_2` has the category `Hot` corresponding to `target = 0`
+    - At the index 9, the `ord_2` has the category `Lava Hot` corresponding to `target = 1`
+
+|    | ord_2   |   ord_2_encoded |   target |
+|---:|:--------|----------------:|---------:|
+|  0 | Hot     |        0.205179 |        0 |
+|  9 | Lava Hot |       0.290751 |        1 |
+
+- For each category in the `ord_2` column, let calculate what is the count & the target sum accordingly
+
+```Python
+df.groupby('ord_2')['target'].agg(['count', 'sum'])
+```
+
+| ord_2       |   count |   sum |
+|:------------|--------:|------:|
+| Boiling Hot |   84790 | 20689 |
+| Cold        |   97822 | 14889 |
+| Freezing    |  142726 | 18876 |
+| Hot         |   67508 | 13851 |
+| Lava Hot    |   64840 | 18853 |
+| Other       |   18075 |  3373 |
+| Warm        |  124239 | 21792 |
+
+- For `row_id = 0`, Hot will be encoded as `(13851 - 0) / (67508-1) = 0.205179`
+- For `row_id = 9`, Lava Hot will be encoded as `(18853 - 1) / (64840-1) = 0.29075`

@@ -12,3 +12,4 @@ plotly
 shap
 jupyter
 beautifulsoup4
+tabulate
