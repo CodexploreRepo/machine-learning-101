@@ -22,12 +22,15 @@ df.loc[df["ord_4"].map(df["ord_4"].value_counts()) < 2000, "ord_4"] = "RARE"
 
 ## Type of Encoders
 
-| Encoder              | Type of Variable | Support High Cardinality | Handle Unseen | Task |
-| :------------------- | :--------------: | :----------------------: |:-------------:|:-------------:|
-| Label Encoding       |   Nominal        |     Yes                  | No            |      |
-| Ordinal Encoding     |   Ordinal        |     Yes                  | Yes           |      |
-| One-Hot Encoding     |   Nominal        |     Not                  | Yes           |      |
-| Target Encoding / Leave One Out Encoding | Nominal | Yes                    | Yes           | Only Classification   |
+| Encoder              | Type of Variable | Support High Cardinality | Handle Unseen | Task | Cons |
+| :------------------- | :--------------: | :----------------------: |:-------------:|:-------------:| :-------------|
+| Label Encoding       |   Nominal        |     Yes                  | No            |      |   |
+| Ordinal Encoding     |   Ordinal        |     Yes                  | Yes           |      |   |
+| One-Hot Encoding     |   Nominal        |     Not                  | Yes           |      | Large Dataset |
+| Target Encoding / Leave One Out Encoding | Nominal | Yes                    | Yes           | Only Classification   | Target Leakage & Un-even Category Distribution |
+| Count / Frequency Encoding | Nominal | Yes                    | Yes           |   | Similar encodings for categories with the same counts|
+| Binary / BaseN Encoding | Nominal | Yes                    | Yes           |   | |
+| Hash Encoding | Nominal | Yes                    | Yes           |   | Irreversible & Information Loss  |
 
 ## Label Encoding / Ordinal Encoding
 - **Label Encoder** is used for *nominal* categorical variables (categories without order i.e., red, green, blue)
@@ -140,3 +143,76 @@ df.groupby('ord_2')['target'].agg(['count', 'sum'])
 
 - For `row_id = 0`, Hot will be encoded as `(13851 - 0) / (67508-1) = 0.205179`
 - For `row_id = 9`, Lava Hot will be encoded as `(18853 - 1) / (64840-1) = 0.29075`
+
+## Count / Frequency Encoding
+- Count and Frequency Encoding encodes categorical variables to the count of occurrences and frequency (normalized count) of occurrences respectively.
+- Cons: Similar encodings 
+    - If all categories have similar counts, the encoded values will be the same
+```Python
+import category_encoders as ce
+
+# Count Encoding - fit on training data, transform test data
+encoder = ce.CountEncoder(cols="type")
+data_train["type_count_encoded"] = encoder.fit_transform(data_train["type"])
+data_test["type_count_encoded"] = encoder.transform(data_test["type"])
+
+# Frequency (normalized count) Encoding
+encoder = ce.CountEncoder(cols="type", normalize=True)
+data_train["type_frequency_encoded"] = encoder.fit_transform(data_train["type"])
+data_test["type_frequency_encoded"] = encoder.transform(data_test["type"])
+
+```
+<p align="center"><img src='../assets/img/freq_encoding.png'></p>
+
+## Binary / BaseN Encoding
+- **Binary Encoding** encodes categorical variables into integers, then converts them to binary code. The output is similar to One-Hot Encoding, but lesser columns are created.
+- This addresses the drawback to One-Hot Encoding where a cardinality of n does not result in `n` number of columns, but `log2(n)` columns. 
+- **BaseN Encoding** follows the same idea but uses other base values instead of 2, resulting in `logN(n)` columns.
+- Pros: 
+    - **Nominal Variables**: Binary and BaseN Encoder are used for nominal categorical variables
+    - **High Cardinality**: Binary and BaseN encoding works well with a high number of categories
+    - **Missing or Unseen Variables**: Binary and BaseN Encoder can handle unseen variables by encoding them with 0 values across all columns
+```Python
+import category_encoders as ce
+
+# Binary Encoding - fit on training data, transform test data
+encoder = ce.BinaryEncoder()
+data_encoded = encoder.fit_transform(data_train["type"])
+encoder.transform(data_test["type"])
+
+# BaseN Encoding - fit on training data, transform test data
+encoder = ce.BaseNEncoder(base=5)
+data_encoded = encoder.fit_transform(data_train["type"])
+encoder.transform(data_test["type"])
+```
+
+<p align="center"><img src='../assets/img/binary_encoding.png'></p>
+
+## Hash Encoding
+- Hash Encoding encodes categorical variables into distinct hash values using a hash function. The output is similar to One-Hot Encoding, but you can choose the number of columns created.
+- Hash encoding can encode high-cardinality data to a fixed-sized array as the number of new columns is manually specified.
+- Pros:
+    - **Nominal Variables**: Hash Encoder is used for nominal categorical variables
+    - **High Cardinality**: Hash encoding works well with a high number of categories
+    - **Missing or Unseen Variables**: Hash Encoder can handle unseen variables by encoding them with null values across all columns
+- Cons:
+    - **Irreversible**: Hashing functions are one-direction such that the original input can be hashed into a hash value, but the original input cannot be retrieved from the hash value
+    - **Information Loss** or **Collision**: If too few columns are created, hash encoding can lead to loss of information as multiple different inputs may result in the same output from the hash function
+- Hash encoding can be done with `FeatureHasher` from the **sklearn** package or with `HashingEncoder` from the **category encoders** package.
+
+```Python
+rom sklearn.feature_extraction import FeatureHasher
+
+# Hash Encoding - fit on training data, transform test data
+encoder = FeatureHasher(n_features=2, input_type="string")
+data_encoded = encoder.fit_transform(data_train["type"]).toarray()
+
+# Using category_encoders
+import category_encoders as ce
+
+# Hash Encoding - fit on training data, transform test data
+encoder = ce.HashingEncoder(n_components=2)
+data_encoded = encoder.fit_transform(data_train["type"])
+```
+
+<p align="center"><img src='../assets/img/hash_encoding.png'></p>
