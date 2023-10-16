@@ -4,13 +4,47 @@
 - Categorical Variables: 
     - **Nomial**: no order associated with like gender (male & female) &#8594; using Label Encoder or Mapping Dictionary
     - **Ordinal**: order associated
-    - **Cyclical**: Monday > Tuesday > .. > Sunday
+    - **Cyclical**: Monday &#8594; Tuesday &#8594; .. &#8594; Sunday
     - **Binary**: only has 0 and 1
     - **Rare Category**:  a category which is not seen very often, or a new category that is not present in train
 ## Rule of Thumbs
-- Rule 1: Fill na with string &#8594; convert all values to string
+- *Rule 1*: Fill na with string &#8594; convert all values to string
     - `data[feat].fillna("Other").astype(str)`
-- Rule 2:  A **rare category** is a category which is not seen very often, or a new category that is not present in train
+- *Rule 2*: **Filter Good & Problematic Categorical Columns** which will affect Encoding Procedure
+  - For example: Unique values in Train Data are different from Unique values in Valid Data &#8594; Solution: ensure values in `Valid Data` is a subset of values in `Train Data`
+  - The simplest approach, however, is to drop the problematic categorical columns.
+```Python
+# Categorical columns in the training data
+object_cols = [col for col in X_train.columns if X_train[col].dtype == "object"]
+
+# Columns that can be safely ordinal encoded
+good_label_cols = [col for col in object_cols if 
+                   set(X_valid[col]).issubset(set(X_train[col]))]
+        
+# Problematic columns that will be dropped from the dataset
+bad_label_cols = list(set(object_cols)-set(good_label_cols))
+        
+print('Categorical columns that will be ordinal encoded:', good_label_cols)
+print('\nCategorical columns that will be dropped from the dataset:', bad_label_cols)
+```
+  - The simplest approach, however, is to drop the problematic categorical columns.
+```Python
+# Drop categorical columns that will not be encoded
+X_train = X_train.drop(bad_label_cols, axis=1)
+X_valid = X_valid.drop(bad_label_cols, axis=1)
+```
+- *Rule 3*: **Investigating Cardinality**
+    - **Cardinality**: # of unique entries of a categorical variable 
+    - *High* cardinality columns can either be dropped from the dataset, or we can use ordinal encoding.
+
+```Python
+# Columns that will be one-hot encoded
+low_cardinality_cols = [col for col in object_cols if X_train[col].nunique() < 10]
+
+# Columns that will be dropped from the dataset
+high_cardinality_cols = list(set(object_cols)-set(low_cardinality_cols))
+```
+- *Rule 4*:  A **rare category** is a category which is not seen very often, or a new category that is not present in train
     - Define our criteria for calling a value “rare” category, so for those categorical which have the count less than certain threshold during the training we can map it to "rare" category
 ```Python
 # below code is to find those categories in col "ord_4" which have the count less then 2000, and assign them to the same category "rare"
@@ -37,6 +71,9 @@ df.loc[df["ord_4"].map(df["ord_4"].value_counts()) < 2000, "ord_4"] = "RARE"
     - Only encode one column at a time and multiple label encoders must be initialized for each categorical column.
 - **Ordinal Encoder** is used for *ordinal* categorical variables (categories with order i.e., small, medium, large).
     - If not specify the order when initialise the Ordinal Encoder, it is equivalent to Label Encoder
+    - For example: This Ordinal Encoder assumes an ordering of the categories: "Never" (0) < "Rarely" (1) < "Most days" (2) < "Every day" (3).
+<p align="center"><img width="764" alt="Screenshot 2021-08-22 at 18 00 58" src="https://user-images.githubusercontent.com/64508435/130351069-8cd904d8-f59d-4c6e-a454-1b636c81c2e2.png"></p>
+
 
 ```Python
 df.loc[:, "ord_2"] = df["ord_2"].fillna("Other")
