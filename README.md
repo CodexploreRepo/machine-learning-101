@@ -1,5 +1,6 @@
 # Advanced Machine Learning
 ## Data Cleaning
+- [EDA](./docs/eda.md)
 - [Outlier Removal](./docs/outlier_removal.md)
 ## Data Pre-processing
 - [Categorical Encoding](./docs/categorical_encoding.md)
