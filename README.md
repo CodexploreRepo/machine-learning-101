@@ -1,4 +1,6 @@
 # Advanced Machine Learning
+## Data Cleaning
+- [Outlier Removal](./docs/outlier_removal.md)
 ## Data Pre-processing
 - [Categorical Encoding](./docs/categorical_encoding.md)
 ## Model Training
