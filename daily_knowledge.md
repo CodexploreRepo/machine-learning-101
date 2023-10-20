@@ -1,4 +1,8 @@
 # Machine Learning 101
+## Day 3
+### EDA
+- The basic metric for location is the `mean`, but it can be **sensitive to extreme values (outlier)**.
+- Other metrics (`median`, `trimmed mean`) are **less sensitive to outliers and unusual distributions** and hence are more robust.
 
 ## Day 2
 ### Pandas

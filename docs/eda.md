@@ -24,9 +24,13 @@ $$\text{Trimmed Mean}= \bar x = \frac{\sum_{i=p+1}^{n-p} x_i}{n-2p}$$
 - Weighted mean, which you calculate by multiplying each data value $x_i$ by a user-specified weight $w_i$ and dividing their sum by the sum of the weights. 
 $$\text{Weighted Mean}= \bar x_w = \frac{\sum_{i=1}^{n} w_i x_i}{\sum_{i=1}^{n} w_i}$$ 
 
+- For example: If we want to compute the average murder rate for the country, we need to use a weighted mean or median to account for different populations in the states. 
+```Python
+np.average(state['Murder.Rate'], weights=state['Population']) # weight used here is population of each state
+```
 ### 2.2. Median 
 - The median is the middle number on a sorted list of the data.
 - The median is referred to as a **robust estimate of location** since it is not influenced by outliers (extreme cases) that could skew the results 
 - When outliers are the result of bad data, the mean will result in a poor estimate of location, while the median will still be valid.
-### 2.3. Outliers
+## 3. Outliers
 -  An **outlier** is any value that is very distant from the other values in a data set.
