@@ -32,5 +32,20 @@ np.average(state['Murder.Rate'], weights=state['Population']) # weight used here
 - The median is the middle number on a sorted list of the data.
 - The median is referred to as a **robust estimate of location** since it is not influenced by outliers (extreme cases) that could skew the results 
 - When outliers are the result of bad data, the mean will result in a poor estimate of location, while the median will still be valid.
-## 3. Outliers
+## 3. Estimates of Variability
+- Location is just one dimension in summarizing a feature. 
+A second dimension, **variability**, also referred to as `dispersion`, measures whether the data values are tightly clustered or spread out. 
+### 3.1. Deviation
+-  Deviations tell us how dispersed the data is around the central value.
+#### 3.1.1. Mean Absolute Deviation
+- Mean absolute deviation and is computed with the formula
+$$\text{Mean Absolute Deviation}= \frac{\sum_{i=1}^{n} |x_i - \bar x |}{n}$$ where $\bar x$ is the sample mean
+- For example: a set of data {1, 4, 4}, the mean is 3 and the median is 4. The deviations from the mean are the differences: 1 – 3 = –2, 4 – 3 = 1, 4 – 3 = 1. 
+    - The absolute value of the deviations is {2 1 1}, and their average is (2 + 1 + 1) / 3 = 1.33.
+#### 3.1.2. Variance & Standard Deviation
+- The best-known estimates of variability are the variance and the standard deviation, which are based on squared deviations. 
+- The **variance** is an average of the squared deviations
+- The **standard deviation** is the square root of the variance
+
+## 4. Outliers
 -  An **outlier** is any value that is very distant from the other values in a data set.
