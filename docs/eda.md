@@ -1,7 +1,11 @@
 # Exploratory Data Analysis (EDA)
 
 - The first step in any data science project: exploring the data.
-
+- In statistical theory, 
+    - **Location** and **Variability** are referred to as the first and second moments of a distribution. 
+    - **Skewness** and **Kurtosis** are called as the third and fourth moments 
+        - Skewness refers to whether the data is skewed to larger or smaller values
+        - Kurtosis indicates the propensity of the data to have extreme values. 
 ## 1. Elements of Structured Data
 - There are two basic types of structured data: numeric and categorical.
 - **Numeric**: Data that are expressed on a numeric scale.
@@ -89,5 +93,45 @@ plt.show()
     - The dashed lines, referred to as **whiskers**, extend from the top and bottom of the box to indicate the range for the bulk of the data
     - Any data outside of the whiskers is plotted as single points or circles (often considered **outliers**).
 
+### 4.2. Frequency Tables and Histograms
+#### Frequency Tables
+- A frequency table of a variable divides up the variable range into equally spaced segments and tells us how many values fall within each segment
+- For example: The function `pandas.cut` creates a series that maps the values into the segments.
+    - The least populous state is Wyoming, with 563,626 people, and the most populous is California, with 37,253,956 people. 
+    - This gives us a range of 37,253,956 – 563,626 = 36,690,330, which we must divide up into equal size bins—let’s say 10 bins. 
+    - With 10 equal size bins, each bin will have a width of 3,669,033, so the first bin will span from $(0.527M, 4.233M]$
+
+```Python
+binnedPopulation = pd.cut(state['Population'], 10)
+```
+
+| binnedPopulation   |   count | States                                                                                                                                           |
+|:-------------------|--------:|:-------------------------------------------------------------------------------------------------------------------------------------------------|
+| (0.527, 4.233]     |      24 | ['AK', 'AR', 'CT', 'DE', 'HI', 'ID', 'IA', 'KS', 'ME', 'MS', 'MT', 'NE', 'NV', 'NH', 'NM', 'ND', 'OK', 'OR', 'RI', 'SD', 'UT', 'VT', 'WV', 'WY'] |
+| (4.233, 7.902]     |      14 | ['AL', 'AZ', 'CO', 'IN', 'KY', 'LA', 'MD', 'MA', 'MN', 'MO', 'SC', 'TN', 'WA', 'WI']                                                             |
+| (7.902, 11.571]    |       6 | ['GA', 'MI', 'NJ', 'NC', 'OH', 'VA']                                                                                                             |
+| (11.571, 15.24]    |       2 | ['IL', 'PA']                                                                                                                                     |
+| (15.24, 18.909]    |       1 | ['FL']                                                                                                                                           |
+| (18.909, 22.578]   |       1 | ['NY']                                                                                                                                           |
+| (22.578, 26.247]   |       1 | ['TX']                                                                                                                                           |
+| (26.247, 29.916]   |       0 | []                                                                                                                                               |
+| (29.916, 33.585]   |       0 | []                                                                                                                                               |
+| (33.585, 37.254]   |       1 | ['CA'] 
+
+#### Histogram
+- A histogram is a way to visualize a frequency table, with bins on the x-axis and the data count on the y-axis.
+
+```Python
+ax = (state['Population'] / 1_000_000).plot.hist(figsize=(4, 4))
+ax.set_xlabel('Population (millions)')
+plt.show()
+```
+<p align="center"><img src="../assets/img/histogram_ex.png" witdh=300></p>
+
+- Understand the histogram:
+    - Empty bins are included in the graph.
+    - Bins are of equal width.
+    - The number of bins (or, equivalently, bin size) is up to the user.
+    - Bars are contiguous — no empty space shows between bars, unless there is an empty bin.
 ## 5. Outliers
 -  An **outlier** is any value that is very distant from the other values in a data set.
