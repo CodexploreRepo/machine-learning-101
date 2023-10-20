@@ -3,7 +3,7 @@
 ### EDA
 - The basic metric for location is the `mean`, but it can be **sensitive to extreme values (outlier)**.
 - Other metrics (`median`, `trimmed mean`) are **less sensitive to outliers and unusual distributions** and hence are more robust.
-
+- The **median** is the same thing as the **50th percentile**. 
 ## Day 2
 ### Pandas
 - `pd.cut` to divide the data into multiple range

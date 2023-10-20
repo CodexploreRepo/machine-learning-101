@@ -42,10 +42,52 @@ A second dimension, **variability**, also referred to as `dispersion`, measures 
 $$\text{Mean Absolute Deviation}= \frac{\sum_{i=1}^{n} |x_i - \bar x |}{n}$$ where $\bar x$ is the sample mean
 - For example: a set of data {1, 4, 4}, the mean is 3 and the median is 4. The deviations from the mean are the differences: 1 – 3 = –2, 4 – 3 = 1, 4 – 3 = 1. 
     - The absolute value of the deviations is {2 1 1}, and their average is (2 + 1 + 1) / 3 = 1.33.
-#### 3.1.2. Variance & Standard Deviation
-- The best-known estimates of variability are the variance and the standard deviation, which are based on squared deviations. 
+#### 3.1.2. Variance & Standard Deviation (MAD)
+- The best-known estimates of variability are the variance and the standard deviation, which are based on *squared deviations*. 
 - The **variance** is an average of the squared deviations
+$$\text{Variance} = s^2 = \frac{\sum_{i=1}^{n} (x_i - \bar x )^2}{n-1}$$
 - The **standard deviation** is the square root of the variance
+    - The standard deviation is much easier to interpret than the variance since it is on the same scale as the original data
+$$\text{Standard Deviation} = s = \sqrt{\text{Variance}}$$
 
-## 4. Outliers
+### 3.2. Estimates Based on Percentiles
+- A different approach to *estimating dispersion* is based on the spread of the sorted data. 
+- The most basic measure is the **range**: the difference between the largest and smallest numbers. 
+    - The *minimum* and *maximum* values themselves are useful to know and are helpful in identifying outliers, but the range is extremely sensitive to outliers and **not very useful as a general measure of dispersion (range) in the data**.
+- To avoid the sensitivity to outliers, we can look at the range of the data after dropping values from each end.
+- `Pth percentile` is a value such that at least $P$ percent of the values take on this value or less and at least $(100 – P)$ percent of the values take on this value or more.
+    - For example: to find the 80th percentile, sort the data. 
+        - Then, starting with the smallest value, proceed 80 percent of the way to the largest value.
+        - Note: the median is the same thing as the 50th percentile. 
+    - The percentile is essentially the same as a quantile, with quantiles indexed by fractions (so the .8 quantile is the same as the 80th percentile).
+- `Interquartile Range` (or `IQR`) is a common measurement of variability is the difference between the **25th percentile** and the **75th percentile**
+    - For example: we have an array {3,1,5,3,6,7,2,9}. 
+        - We sort these to get {1,2,3,3,5,6,7,9}. 
+        - The 25th percentile is at 2.5, and the 75th percentile is at 6.5, so the interquartile range is 6.5 – 2.5 = 4. 
+
+```Python
+state['Population'].quantile(0.75) - state['Population'].quantile(0.25)
+```
+## 4. Exploring the Data Distribution
+- Each of the estimates sums up the data in a single number to describe the location or variability of the data. 
+- It is also useful to explore how the data is distributed overall.
+### 4.1. Percentiles and Boxplots
+- Percentiles are also valuable for summarizing the entire distribution
+
+<p align="center"><img src="../assets/img/box_plot_explain.png" witdh=300></p>
+
+```Python
+ax = (state['Population'] / 1_000_000).plot.box(figsize=(4,6))
+ax.set_ylabel('Population (millions)')
+plt.show()
+```
+<p align="center"><img src="../assets/img/box_plot_ex1.png" height=350></p>
+
+- Understand the box plot:
+    - The top and bottom of the box are the 75th (7M people) and 25th (2M people) percentiles
+    - The median (5M people) is shown by the horizontal line in the box.
+    - The dashed lines, referred to as **whiskers**, extend from the top and bottom of the box to indicate the range for the bulk of the data
+    - Any data outside of the whiskers is plotted as single points or circles (often considered **outliers**).
+
+## 5. Outliers
 -  An **outlier** is any value that is very distant from the other values in a data set.
