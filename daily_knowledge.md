@@ -1,17 +1,35 @@
 # Machine Learning 101
+
 ## Day 3
+
 ### EDA
+
 - The basic metric for location is the `mean`, but it can be **sensitive to extreme values (outlier)**.
 - Other metrics (`median`, `trimmed mean`) are **less sensitive to outliers and unusual distributions** and hence are more robust.
-- The **median** is the same thing as the **50th percentile**. 
+- The **median** is the same thing as the **50th percentile**.
+
+#### Correlation
+
+- Pearson’s correlation coefficient always lies between
+
+  - $+1$ perfect positive correlation
+  - $–1$ perfect negative correlation
+  - $0$ indicates no correlation.
+
+- NOTE: Variables can have an association that is **not linear**, in which case the correlation coefficient may not be a useful metric.
+  - For example: . The relationship between tax rates and revenue raised is an example: as tax rates increase from zero, the revenue raised also increases. However, once tax rates reach a high level and approach 100%, tax avoidance increases and tax revenue actually declines.
+
 ## Day 2
+
 ### Pandas
+
 - `pd.cut` to divide the data into multiple range
+
 ```Python
-# If right == True (the default), then the bins [1, 2, 10**6, float('inf')] 
-#                              indicate (1,2], (2,3], (10**6, float('inf')]. 
+# If right == True (the default), then the bins [1, 2, 10**6, float('inf')]
+#                              indicate (1,2], (2,3], (10**6, float('inf')].
 # This argument is ignored when bins is an IntervalIndex.
-mapping = pd.cut(make_df['mean'], [0, 10**4, 2.5*(10**4), 3.6*(10**4), 5.5*(10**4), 10**5, 10**6, float('inf')], 
+mapping = pd.cut(make_df['mean'], [0, 10**4, 2.5*(10**4), 3.6*(10**4), 5.5*(10**4), 10**5, 10**6, float('inf')],
         labels=['low', ' mid-1', 'mid-2', 'high-class', 'luxury' ,'super luxury', 'exotic'], right=True)
 
 # make_category = {
@@ -24,29 +42,41 @@ mapping = pd.cut(make_df['mean'], [0, 10**4, 2.5*(10**4), 3.6*(10**4), 5.5*(10**
 #     'low'  : (0, 10**4]
 # }
 ```
+
 ### Scikit-learn
+
 - `.fit()`, `.transform()`, `.predict()` needs to provide as `[[1], [2], [1], ..]` format
-  - Solution: 
+  - Solution:
     - **Method 1** using reshape: `[1,2,1].reshape(-1, 1)` or `ohe.fit_transform(df['col'].values.reshape(-1, 1))`
     - **Method 2** using `[[]]`: `model.fit(df[['col']].values)`
 - `UserWarning: X does not have valid feature names, but IsolationForest was fitted with feature name`
   - Root Cause: this happens when we `.fit()`the model/encoder/sklearn object with DataFrame, but when we `.predict()` with Numpy array
   - Solution: `.fit(df.values)` so that we will provide to the sklearn object the Numpy array
+
 ### Numpy
+
 - Convert sparse matrix (only store position of where has value != 0) to dense: `sparse_matrix.to_array()`
   - FYI: the matrix returns after one-hot encoding is a spare matrix
+
 ## Day 1
+
 ### Dimensionality Reduction Techniques
+
 - PCA
 - t-SNE
 - MCA
+
 ### Data Pre-processing
+
 #### Scaler
+
 - Min Max Scaler
 - PowerTransformer
 
 - Note: NO need to scale those are One-Hot encoded
+
 #### Categorical Feature
+
 ##### Rare Category
 
 - A **rare category** is a category which is not seen very often, or a new category that is not present in train
@@ -56,12 +86,15 @@ mapping = pd.cut(make_df['mean'], [0, 10**4, 2.5*(10**4), 3.6*(10**4), 5.5*(10**
 ### Model Training
 
 #### Regression
+
 - Target variable: as the y has a wide range, so better to convert to log scale before training
+
 ```Python
 y_train = np.log1p(df_train.price.values)
 y_val   = np.log1p(df_val.price.values)
 y_test  = np.log1p(df_test.price.values)
 ```
+
 #### Binary Classification
 
 - If the target is **skewed** (class 0 dominates class 1) &#8594; the best metric for this binary classification problem would be `Area Under the ROC Curve (AUC)``.
