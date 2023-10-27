@@ -1,11 +1,12 @@
 category_encoders>=2.6.2
 ipykernel
 # Optimization
-scikit_optimize #skopt module
 hyperopt 
 optuna
 # Model
+scikit-learn
 xgboost
+pandas
 matplotlib
 seaborn
 plotly
