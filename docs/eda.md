@@ -61,8 +61,10 @@ np.average(state['Murder.Rate'], weights=state['Population']) # weight used here
 
 ##### 2.2.1.1 Mean Absolute Deviation
 
-- Mean absolute deviation and is computed with the formula
-  $$\text{Mean Absolute Deviation}= \frac{\sum_{i=1}^{n} |x_i - \bar x |}{n}$$ where $\bar x$ is the sample mean
+- Mean absolute deviation and is computed with the formula where $\bar x$ is the sample mean
+
+$$\text{Mean Absolute Deviation}= \frac{\sum_{i=1}^{n} |x_i - \bar x|}{n}$$
+
 - For example: a set of data {1, 4, 4}, the mean is 3 and the median is 4. The deviations from the mean are the differences: 1 – 3 = –2, 4 – 3 = 1, 4 – 3 = 1.
   - The absolute value of the deviations is {2 1 1}, and their average is (2 + 1 + 1) / 3 = 1.33.
 
@@ -220,4 +222,4 @@ plt.show()
 - Expected value is a fundamental concept in business valuation and capital budgeting
 - For example: the marketer firm figures that 5% of the attendees will sign up for the $300 service, 15% will sign up for the $50 service, and 80% will not sign up for anything.
   - The expected value of a webinar attendee is thus $22.50 per month, calculated as follows:
-$$ EV = (0.05)*(300) + (0.15)*50 + (0.8)\*0 = 22.5 $$
+$$EV = (0.05)*(300) + (0.15)*50 + (0.8)*0 = 22.5$$
