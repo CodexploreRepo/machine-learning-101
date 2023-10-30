@@ -230,6 +230,8 @@ $$EV = (0.05)*(300) + (0.15)*50 + (0.8)*0 = 22.5$$
 
 ## 4. Multivariate Analysis
 
+- The appropriate type of bivariate or multivariate analysis depends on the nature of the data: numeric versus categorical.
+
 ### 4.1. Two Numerical Variables (Correlation)
 
 - EDA in many modeling projects involves examining correlation **among predictors**, and **between predictors and a target variable**.
@@ -237,9 +239,9 @@ $$EV = (0.05)*(300) + (0.15)*50 + (0.8)*0 = 22.5$$
 - **Negatively correlated** if high values of X go with low values of Y, and vice versa.
 - Key concepts:
   - **Correlation coefficient**: A metric that measures the extent to which numeric variables are associated with one another (ranges from –1 to +1).
+    - Like the mean and standard deviation, the correlation coefficient is **sensitive to outliers** in the data.
   - **Correlation matrix (Pearson’s correlation) & Heatmap**: A table where the variables are shown on both rows and columns, and the cell values are the correlations between the variables.
-  - **Scatterplot**: A plot in which the x-axis is the value of one variable, and the y-axis the value of another.
-  - Like the mean and standard deviation, the correlation coefficient is **sensitive to outliers** in the data.
+  - **Scatterplot (for small number of data values)**: A plot in which the x-axis is the value of one variable, and the y-axis the value of another.
 
 #### 4.1.1 Correlation coefficient
 
@@ -357,8 +359,11 @@ plt.show()
 ax = telecom.plot.scatter(x='T', y='VZ', figsize=(4, 4), marker='$\u25EF$')
 ax.set_xlabel('ATT (T)')
 ax.set_ylabel('Verizon (VZ)')
-ax.axhline(0, color='grey', lw=1)
-ax.axvline(0, color='grey', lw=1)
+ax.axhline(0, color='grey', lw=1) # to plot the zero-crossing line
+ax.axvline(0, color='grey', lw=1) # to plot the zero-crossing line
+
+plt.tight_layout()
+plt.show()
 
 # pair-plot
 sns.pairplot(df,
@@ -368,3 +373,56 @@ sns.pairplot(df,
               hue='Col Target')
 plt.show()
 ```
+
+#### 4.1.4. Hexagonal Binning and Contours (Plotting Numeric Versus Numeric Data)
+
+- **Scatterplots** are fine when there is a relatively small number of data values.
+  - For data sets with hundreds of thousands or millions of records, a scatterplot will be **too dense**, so we need a different way to visualize the relationship.
+- **Hexagonal binning plot** is to group the records into hexagonal bins and plotted the hexagons with a color indicating the number of records in that bin.
+- The `hexbin` method for pandas data frames is one powerful approach.
+
+### 4.2. Two Categorical Variables
+
+- A useful way to summarize two categorical variables is a **contingency table** a table of counts by category.
+  - Contingency tables can look only at counts, or they can also include column and total percentages.
+- For example: contingency table between the grade of a personal loan and the outcome of that loan.
+  - The **grade** goes from A (high) to G (low).
+  - The **outcome** is either fully paid, current, late, or charged off (the balance of the loan is not expected to be collected).
+
+```Python
+# Contingency table (Count)
+crosstab = lc_loans.pivot_table(index='grade', columns='status',
+                                aggfunc=lambda x: len(x), margins=True)
+```
+
+| grade | Charged Off | Current | Fully Paid | Late |    All |
+| :---- | ----------: | ------: | ---------: | ---: | -----: |
+| A     |        1562 |   50051 |      20408 |  469 |  72490 |
+| B     |        5302 |   93852 |      31160 | 2056 | 132370 |
+| C     |        6023 |   88928 |      23147 | 2777 | 120875 |
+| D     |        5007 |   53281 |      13681 | 2308 |  74277 |
+| E     |        2842 |   24639 |       5949 | 1374 |  34804 |
+| F     |        1526 |    8444 |       2328 |  606 |  12904 |
+| G     |         409 |    1990 |        643 |  199 |   3241 |
+| All   |       22671 |  321185 |      97316 | 9789 | 450961 |
+
+```Python
+# Contingency table (Percentage)
+df = crosstab.copy().loc['A':'G',:] # to filter "All" record
+df.loc[:,'Charged Off':'Late'] = df.loc[:,'Charged Off':'Late'].div(df['All'], axis=0) # divide col from 'Charged Off' to 'Late' with 'All' col, which is the total record per grade
+df['All'] = df['All'] / sum(df['All'])
+
+perc_crosstab = df
+```
+
+| grade | Charged Off |  Current | Fully Paid |       Late |        All |
+| :---- | ----------: | -------: | ---------: | ---------: | ---------: |
+| A     |   0.0215478 | 0.690454 |   0.281528 | 0.00646986 |   0.160746 |
+| B     |   0.0400544 | 0.709013 |   0.235401 |  0.0155322 |   0.293529 |
+| C     |   0.0498283 | 0.735702 |   0.191495 |  0.0229741 |   0.268039 |
+| D     |   0.0674098 | 0.717328 |   0.184189 |  0.0310729 |   0.164708 |
+| E     |   0.0816573 | 0.707936 |   0.170929 |  0.0394782 |  0.0771774 |
+| F     |    0.118258 | 0.654371 |   0.180409 |  0.0469622 |  0.0286144 |
+| G     |    0.126196 | 0.614008 |   0.198396 |  0.0614008 | 0.00718687 |
+
+- This table shows the count and row percentages. High-grade loans have a very low late/charge-off percentage as compared with lower-grade loans.
