@@ -10,6 +10,7 @@
 
 #### Correlation
 
+- Like the mean and standard deviation, the **correlation coefficient** is **sensitive** to **outliers** in the data.
 - Pearson’s correlation coefficient always lies between
 
   - $+1$ perfect positive correlation

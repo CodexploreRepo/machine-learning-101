@@ -228,17 +228,20 @@ plt.show()
   - The expected value of a webinar attendee is thus $22.50 per month, calculated as follows:
 $$EV = (0.05)*(300) + (0.15)*50 + (0.8)*0 = 22.5$$
 
-## 4. Correlation (among predictors or between predictors and a target variable)
+## 4. Multivariate Analysis
 
-- EDA in many modeling projects involves examining correlation among predictors, and between predictors and a target variable.
+### 4.1. Two Numerical Variables (Correlation)
+
+- EDA in many modeling projects involves examining correlation **among predictors**, and **between predictors and a target variable**.
 - **Positively correlated** if high values of X go with high values of Y, and low values of X go with low values of Y.
 - **Negatively correlated** if high values of X go with low values of Y, and vice versa.
 - Key concepts:
   - **Correlation coefficient**: A metric that measures the extent to which numeric variables are associated with one another (ranges from –1 to +1).
-  - **Correlation matrix**: A table where the variables are shown on both rows and columns, and the cell values are the correlations between the variables.
+  - **Correlation matrix (Pearson’s correlation) & Heatmap**: A table where the variables are shown on both rows and columns, and the cell values are the correlations between the variables.
   - **Scatterplot**: A plot in which the x-axis is the value of one variable, and the y-axis the value of another.
+  - Like the mean and standard deviation, the correlation coefficient is **sensitive to outliers** in the data.
 
-### 4.1. Correlation coefficient
+#### 4.1.1 Correlation coefficient
 
 - Pearson’s correlation coefficient always lies between
 
@@ -251,4 +254,117 @@ $$EV = (0.05)*(300) + (0.15)*50 + (0.8)*0 = 22.5$$
     $$
 
 - Variables can have an association that is **not linear**, in which case the correlation coefficient may not be a useful metric.
-  - For example: . The relationship between tax rates and revenue raised is an example: as tax rates increase from zero, the revenue raised also increases. However, once tax rates reach a high level and approach 100%, tax avoidance increases and tax revenue actually declines.
+  - For example: The relationship between tax rates and revenue raised is an example: as tax rates increase from zero, the revenue raised also increases. However, once tax rates reach a high level and approach 100%, tax avoidance increases and tax revenue actually declines.
+
+#### 4.1.2. Correlation matrix (Pearson’s correlation) & Heatmap
+
+**Heatmap**
+
+```Python
+def plot_heatmap(df_corr, title):
+  _, ax = plt.subplots(figsize=(8,6))
+
+  # ones_like can build a matrix of booleans (True, False) with the same shape as our data
+  ones_corr = np.ones_like(df_corr, dtype=bool)
+  # np's triu: return only upper triangle matrix
+  mask = np.triu(ones_corr)
+  # When removing the upper tri-angle, here are still two empty cells in our matrix (calories & vitamin)
+  adjusted_mask = mask[1:, :-1]
+  adjusted_df_corr = df_corr.iloc[1:, :-1]
+
+  sns.heatmap(data=adjusted_df_corr, mask=adjusted_mask,
+              annot=True, annot_kws={"fontsize":12}, fmt=".2f", cmap='Blues',
+              vmin=-1, vmax=1,
+              linecolor='white', linewidths=0.5);
+
+  yticks = [i.upper() for i in adjusted_df_corr.index]
+  xticks = [i.upper() for i in adjusted_df_corr.columns]
+
+  ax.set_yticklabels(yticks, rotation=0, fontsize=10);
+  ax.set_xticklabels(xticks, rotation=90, fontsize=10);
+  title = f'CORRELATION MATRIX\n{title.upper()}\n'
+  ax.set_title(title, loc='left', fontsize=14)
+  plt.tight_layout()
+  plt.show()
+
+plot_heatmap(df_corr, 'Rollover Coaster Features')
+```
+
+**Corr Ellipses**
+
+- The orientation of the ellipse indicates whether two variables are _positively correlated (ellipse is pointed to the top right_) or _negatively correlated (ellipse is pointed to the top left)_.
+- The **shading** and **width** of the ellipse indicate the strength of the association: **thinner** and **darker** ellipses correspond to **stronger** relationships.
+
+<p align="center"><img src="../assets/img/corr_ellipse_plot.png" witdh=400></p>
+
+- Understanding the corr ellipse plot:
+  - _High Correlation_: The ETFs for the S&P 500 (SPY) and the Dow Jones Index (DIA) have a high correlation.
+    - Similarly, the QQQ and the XLK, composed mostly of technology companies, are positively correlated
+  - _Weekly or Negative Correlation_: Defensive ETFs, such as those tracking gold prices (GLD), oil prices (USO), or market volatility (VXX), tend to be weakly or negatively correlated with the other ETFs.
+
+```Python
+from matplotlib.collections import EllipseCollection
+from matplotlib.colors import Normalize
+
+def plot_corr_ellipses(data, figsize=None, **kwargs):
+    ''' https://stackoverflow.com/a/34558488 '''
+    M = np.array(data)
+    if not M.ndim == 2:
+        raise ValueError('data must be a 2D array')
+    fig, ax = plt.subplots(1, 1, figsize=figsize, subplot_kw={'aspect':'equal'})
+    ax.set_xlim(-0.5, M.shape[1] - 0.5)
+    ax.set_ylim(-0.5, M.shape[0] - 0.5)
+    ax.invert_yaxis()
+
+    # xy locations of each ellipse center
+    xy = np.indices(M.shape)[::-1].reshape(2, -1).T
+
+    # set the relative sizes of the major/minor axes according to the strength of
+    # the positive/negative correlation
+    w = np.ones_like(M).ravel() + 0.01
+    h = 1 - np.abs(M).ravel() - 0.01
+    a = 45 * np.sign(M).ravel()
+
+    ec = EllipseCollection(widths=w, heights=h, angles=a, units='x', offsets=xy,
+                           norm=Normalize(vmin=-1, vmax=1),
+                           transOffset=ax.transData, array=M.ravel(), **kwargs)
+    ax.add_collection(ec)
+
+    # if data is a DataFrame, use the row/column names as tick labels
+    if isinstance(data, pd.DataFrame):
+        ax.set_xticks(np.arange(M.shape[1]))
+        ax.set_xticklabels(data.columns, rotation=90)
+        ax.set_yticks(np.arange(M.shape[0]))
+        ax.set_yticklabels(data.index)
+
+    return fig, ec, ax
+
+fig, m, ax = plot_corr_ellipses(etfs.corr(), figsize=(6, 4), cmap='bwr_r') #cmap='Greens', cmap='bwr_r'
+cb = fig.colorbar(m, ax=ax)
+cb.set_label('Correlation coefficient')
+
+plt.tight_layout()
+plt.show()
+```
+
+#### 4.1.3 Scatter Plot & Pairplot
+
+- The standard way to visualize the relationship between two measured data variables is with a scatterplot.
+- Pairplot is to plot multiple pair-wise scatterplot
+
+```Python
+# scatter plot via df.plot()
+ax = telecom.plot.scatter(x='T', y='VZ', figsize=(4, 4), marker='$\u25EF$')
+ax.set_xlabel('ATT (T)')
+ax.set_ylabel('Verizon (VZ)')
+ax.axhline(0, color='grey', lw=1)
+ax.axvline(0, color='grey', lw=1)
+
+# pair-plot
+sns.pairplot(df,
+             vars=['Col A','Col B',
+                   'Col C','Col D'
+                  ],
+              hue='Col Target')
+plt.show()
+```
