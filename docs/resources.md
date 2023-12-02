@@ -9,3 +9,7 @@
 
 - AAMLP
 - [Machine Learning with Python Cookbook, 2nd Edition](https://learning.oreilly.com/library/view/machine-learning-with/9781098135713/)
+
+## Github
+
+- [ML Zoomcamp](https://github.com/ziritrion/ml-zoomcamp/tree/main)
