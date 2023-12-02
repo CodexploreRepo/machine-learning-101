@@ -8,6 +8,11 @@
 - Other metrics (`median`, `trimmed mean`) are **less sensitive to outliers and unusual distributions** and hence are more robust.
 - The **median** is the same thing as the **50th percentile**.
 
+#### Plots
+
+- **Violin plot** is an enhancement to the boxplot, show nuances (sac thai) in the distribution
+- **Boxplot** is to show the outliers in the data
+
 #### Correlation
 
 - Like the mean and standard deviation, the **correlation coefficient** is **sensitive** to **outliers** in the data.

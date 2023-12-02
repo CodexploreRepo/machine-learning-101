@@ -6,6 +6,10 @@
   - **Skewness** and **Kurtosis** are called as the third and fourth moments
     - Skewness refers to whether the data is skewed to larger or smaller values
     - Kurtosis indicates the propensity of the data to have extreme values.
+- Plot:
+  - **Hexagonal binning** and **contour plots** are useful tools that permit graphical examination of two numeric variables at a time, without being overwhelmed by huge amounts of data.
+  - **Contingency tables** are the standard tool for looking at the counts of two categorical variables.
+  - **Boxplots** and **violin plots** allow you to plot a numeric variable against a categorical variable.
 
 ## 1. Elements of Structured Data
 
@@ -111,7 +115,7 @@ state['Population'].quantile(0.75) - state['Population'].quantile(0.25)
 
 - Percentiles are also valuable for summarizing the entire distribution
 
-<p align="center"><img src="../assets/img/box_plot_explain.png" witdh=300></p>
+<p align="center"><img src="../assets/img/box_plot_explain.png" width=400></p>
 
 ```Python
 ax = (state['Population'] / 1_000_000).plot.box(figsize=(4,6))
@@ -164,7 +168,7 @@ ax.set_xlabel('Population (millions)')
 plt.show()
 ```
 
-<p align="center"><img src="../assets/img/histogram_ex.png" witdh=300></p>
+<p align="center"><img src="../assets/img/histogram_ex.png" width=300></p>
 
 - Understand the histogram:
   - Empty bins are included in the graph.
@@ -186,7 +190,7 @@ ax.set_xlabel('Murder Rate (per 100,000)')
 plt.show()
 ```
 
-<p align="center"><img src="../assets/img/histogram_density_ex.png" witdh=300></p>
+<p align="center"><img src="../assets/img/histogram_density_ex.png" width=300></p>
 
 ### 2.4. Outliers
 
@@ -297,7 +301,7 @@ plot_heatmap(df_corr, 'Rollover Coaster Features')
 - The orientation of the ellipse indicates whether two variables are _positively correlated (ellipse is pointed to the top right_) or _negatively correlated (ellipse is pointed to the top left)_.
 - The **shading** and **width** of the ellipse indicate the strength of the association: **thinner** and **darker** ellipses correspond to **stronger** relationships.
 
-<p align="center"><img src="../assets/img/corr_ellipse_plot.png" witdh=400></p>
+<p align="center"><img src="../assets/img/corr_ellipse_plot.png" width=400></p>
 
 - Understanding the corr ellipse plot:
   - _High Correlation_: The ETFs for the S&P 500 (SPY) and the Dow Jones Index (DIA) have a high correlation.
@@ -426,3 +430,49 @@ perc_crosstab = df
 | G     |    0.126196 | 0.614008 |   0.198396 |  0.0614008 | 0.00718687 |
 
 - This table shows the count and row percentages. High-grade loans have a very low late/charge-off percentage as compared with lower-grade loans.
+
+### 4.3. Categorical and Numeric Data
+
+#### 4.3.1. Boxplots
+
+- Boxplots are a simple way to visually compare the distributions of a numeric variable **grouped** according to a categorical variable.
+  - For example:
+    - Alaska airline stands out as having the fewest delays, while
+    - American airline has the most delays: the lower quartile for American is higher than the upper quartile for Alaska.
+
+<p align="center"><img src="../assets/img/boxplot_percent_airline_delays_by_carriers.png" width=500></p>
+
+#### 4.3.2. Violin plot
+
+- A violin plot is a combination of the box plot with a kernel density plot.
+- The advantage of a violin plot is that it can show nuances (sac thai) in the distribution that aren’t perceptible in a boxplot.
+- On the other hand, the boxplot more clearly shows the outliers in the data.
+- _Example 1_: Understand violin plot by comparison with histogram (KDE) & boxplot of normal distribution
+  - The density (KDE) is mirrored and flipped over, and the resulting shape is filled in, creating an image resembling a violin.
+  - Wider sections of the violin plot represent a **higher probability** of observations taking a given value, the thinner sections correspond to a **lower probability**.
+
+```Python
+def plot_comparison(x, title):
+    fig, ax = plt.subplots(3, 1, sharex=True)
+    sns.distplot(x, ax=ax[0])
+    ax[0].set_title('Histogram + KDE')
+    sns.boxplot(x, ax=ax[1])
+    ax[1].set_title('Boxplot')
+    sns.violinplot(x, ax=ax[2])
+    ax[2].set_title('Violin plot')
+    fig.suptitle(title, fontsize=16)
+    plt.show()
+
+sample_gaussian = np.random.normal(size=N)
+plot_comparison(sample_gaussian, 'Standard Normal Distribution')
+```
+
+<p align="center"><img src="../assets/img/kde_boxplot_violinplot.webp" width=500></p>
+
+- _Example 2_:
+  - The violin plot below shows a concentration in the distribution near zero for Alaska
+  <p align="center"><img src="../assets/img/violin_plot_example.png" width=400></p>
+
+### 4.4. Multiple Variables
+
+- The types of charts used to compare two variables—scatterplots, hexagonal binning, and boxplots—are readily extended to more variables through the notion of **conditioning** (facets).
