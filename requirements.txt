@@ -14,3 +14,4 @@ shap
 jupyter
 beautifulsoup4
 tabulate
+tqdm

@@ -12,4 +12,4 @@
 
 ## Github
 
-- [ML Zoomcamp](https://github.com/ziritrion/ml-zoomcamp/tree/main)
+- [ML Zoomcamp](https://github.com/ziritrion/ml-zoomcamp/tree/main) & [Documentation](https://www.linkedin.com/in/marcos-benicio-de-andrade-alonso/)

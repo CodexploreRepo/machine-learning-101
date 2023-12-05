@@ -91,6 +91,15 @@ mapping = pd.cut(make_df['mean'], [0, 10**4, 2.5*(10**4), 3.6*(10**4), 5.5*(10**
 
 ### Model Training
 
+- Split Train, Val, Test with 60-20-20
+
+```Python
+# Train, Test, Val Splits
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42, shuffle=True, test_size=0.2)
+
+X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, random_state=42, shuffle=True, test_size=0.25) # 0.25 x 0.8 = 0.2
+```
+
 #### Regression
 
 - Target variable: as the y has a wide range, so better to convert to log scale before training

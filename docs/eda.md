@@ -255,10 +255,8 @@ $$EV = (0.05)*(300) + (0.15)*50 + (0.8)*0 = 22.5$$
   - $–1$ perfect negative correlation
   - $0$ indicates no correlation.
     $$
-    {
       r = \frac{{}\sum_{i=1}^{n} (x_i - \overline{x})(y_i - \overline{y})}
       {(n-1)\sqrt{\sum_{i=1}^{n} (x_i - \overline{x})^2  \sum_{i=1}^{n}(y_i - \overline{y})^2}}
-    }
     $$
 
 - Variables can have an association that is **not linear**, in which case the correlation coefficient may not be a useful metric.
