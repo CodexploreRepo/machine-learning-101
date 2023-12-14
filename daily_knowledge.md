@@ -2,6 +2,41 @@
 
 ## Day 3
 
+### Sklearn's Pipeline
+
+- `SelectFromModel` transformer based on the feature importance of `RandomForestRegressor` before the final regressor:
+
+```Python
+from sklearn.feature_selection import SelectFromModel
+
+selector_pipeline = Pipeline([
+    ('preprocessing', preprocessing),
+    ('selector', SelectFromModel(RandomForestRegressor(random_state=42),
+                                 threshold=0.005)),  # min feature importance score
+    ('svr', SVR(C=rnd_search.best_params_["svr__C"],
+                gamma=rnd_search.best_params_["svr__gamma"],
+                kernel=rnd_search.best_params_["svr__kernel"])),
+])
+
+```
+
+### Hyperparameter Tuning
+
+#### Grid Search
+
+- Notice that the value of `C` is the maximum tested value. When this happens you definitely want to launch the grid search again with higher values for `C` (removing the smallest values), because it is likely that higher values of `C` will be better.
+
+```Python
+# params: 'svr__C': [1.0, 3.0, 10., 30., 100., 300., 1000.0]
+# best hyper-params
+grid_search.best_params_ # {'svr__C': 10000.0, 'svr__kernel': 'linear'}
+```
+
+### Vocab
+
+- Stochastics: randomness
+  - For example: k-means is a stochastic algorithm, meaning that it relies on randomness to locate the clusters
+
 ### EDA
 
 - The basic metric for location is the `mean`, but it can be **sensitive to extreme values (outlier)**.
@@ -76,12 +111,37 @@ mapping = pd.cut(make_df['mean'], [0, 10**4, 2.5*(10**4), 3.6*(10**4), 5.5*(10**
 
 #### Scaler
 
-- Min Max Scaler
-- PowerTransformer
+- There are two common ways to get all attributes to have the same scale:
 
-- Note: NO need to scale those are One-Hot encoded
+  - Min-max Scaling (a.k.a Normalization): &#8594; Range (0 & 1)
+
+    - This is performed by subtracting the min value and dividing by the difference between the min and the max.
+    - It has a feature_range hyperparameter that lets you change the range.
+
+    ```Python
+    from sklearn.preprocessing import MinMaxScaler
+
+    min_max_scaler = MinMaxScaler(feature_range=(-1, 1))
+    housing_num_min_max_scaled = min_max_scaler.fit_transform(housing_num)
+    ```
+
+  - Standardization: it subtracts the mean value (so standardized values have a zero mean), then it divides the result by the standard deviation (so standardized values have a standard deviation equal to 1)
+    - Unlike min-max scaling, standardization does not restrict values to a specific range. However, standardization is much less affected by outliers.
+
+- Note 1: NO need to scale those are One-Hot encoded
+- Note 2: While the training set values will always be scaled to the specified range, if new data contains outliers, these may end up scaled outside the range.
+  - If you want to avoid this, just set the `clip` hyperparameter to `True`
+- Note 3: Neural networks work best with zero-mean inputs, so the scaled range of –1 to 1 is preferable
 
 #### Categorical Feature
+
+##### Encoding
+
+- If a categorical attribute has a large number of possible categories (e.g., country code, profession, species), then one-hot encoding will result in a large number of input features.
+- Solution:
+  - For example, a country code could be replaced with the country’s population and GDP per capita).
+  - Alternatively, you can use one of the encoders provided by the category_encoders package on GitHub.
+  - When dealing with neural networks, you can replace each category with a learnable, low-dimensional vector called an embedding. This is an example of representation learning (see Chapters [13](https://learning.oreilly.com/library/view/hands-on-machine-learning/9781098125967/ch13.html#data_chapter) and [17](https://learning.oreilly.com/library/view/hands-on-machine-learning/9781098125967/ch17.html#autoencoders_chapter) for more details).
 
 ##### Rare Category
 
