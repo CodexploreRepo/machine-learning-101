@@ -14,6 +14,8 @@
 - [Model Training](./docs/model_training.md)
 - [Hyperparameter Tuning](./docs/hyperparameter_tuning.md)
 
+## Regression
+
 ## Statistics
 
 - [Hypothesis Testing](./docs/statistics/hypothesis_testing.md)
