@@ -148,6 +148,7 @@ cython_debug/
 input/
 models/
 # data files
+*.txt
 *.csv
 *.h5
 *.pkl
