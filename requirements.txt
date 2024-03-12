@@ -15,3 +15,5 @@ jupyter
 beautifulsoup4
 tabulate
 tqdm
+openpyxl 
+lifetimes

@@ -18,6 +18,12 @@
 
 ### Regression
 
+## Application
+
+### Marketing Science
+
+- [Customer Churn Model](./docs/marketing-science/customer-churn.md)
+
 ## Statistics
 
 - [Hypothesis Testing](./docs/statistics/hypothesis_testing.md)
