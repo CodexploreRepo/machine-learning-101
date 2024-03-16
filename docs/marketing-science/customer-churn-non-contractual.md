@@ -1,4 +1,4 @@
-# Customer Churn Model
+# Customer Churn Model - Non-Contractual
 
 ## Introduction
 
@@ -10,9 +10,7 @@
   - A customer who has made X number of purchases so far can either return for another purchase, or may never return.
   - Various approaches have been proposed to analyze the purchase behavior of customers by making distributional assumptions, including anomaly detection and Customer Lifetime Value (CLV) analysis
 
-## Non-Contractual Churn
-
-### Buy ’Til You Die Models
+## Buy ’Til You Die Models
 
 - **Buy ’Til You Die Models** (BTYD): from the “birth” of a customer (when she places her first order with our business) to the day she “dies” (when she turns to a competitor and thus is dead to us, the enterprise she’s spurned).
 - BTYD is a class of statistical models to analyze customers’ behavioral and purchasing patterns in a non-subscription business model to model and predict a customer’s lifetime value (CLV or LTV).
@@ -21,7 +19,7 @@
 - The **BG/NBD** model predicts the future _expected number of transactions_ over a _pre-defined period_ together with the _probability of a customer being alive_.
 - The **Gamma-Gamma** model will tie into the BG/NBD model to predict the _expected monetary value_ of the purchases in terms of current dollar value after discounting at a predetermined discount rate.
 
-### Customer Lifetime Value (CLV)
+## Customer Lifetime Value (CLV)
 
 - **Customer Lifetime Value** or CLV is the total `net income`, i.e: revenue minus costs, or `revenue`(depends on the data availablity) that a company can expect to earn from its customers over their entire relationship
   — Either at the individual customer level, cohort level, or over the entirety of its customer base
@@ -29,7 +27,7 @@
 - Usage: marketing and ecommerce
 - CLV tells you the predicted value each customer will bring to your business over their lifetime, and as such requires the ability to detect which customers will churn as well as what they’re likely to spend if they’re retained.
 
-### CLV Calculation
+## CLV Calculation
 
 - Combination of models to calculate CLV:
   - Beta Geometric Negative Binomial Distribution (BG/NBD) model
@@ -41,7 +39,7 @@
   - The average order value of each customer’s order
   - The total amount each customer will generate for the business
 
-#### Data Preparation: RFM (Recency, Frequency, and Monetary Value) & T (Tenure)
+### Data Preparation: RFM (Recency, Frequency, and Monetary Value) & T (Tenure)
 
 - Both BG/NBD and Gamma-Gamma models require only the following data points at the customer level:
   - **Recency (R)** represents the age of a customer when they made their most recent purchase. This is equal to the duration between a customer’s first purchase and their latest purchase.
@@ -123,6 +121,174 @@ for idx, metric in enumerate(['recency', 'frequency', 'T', 'monetary_value']):
     sns.histplot(df_rfmt[metric], kde=True, ax=eval(f"ax{idx+1}"))
 plt.show()
 ```
+
+### BG/NBD model
+
+- In non-contractual business settings, the purchase behavior of customers does not follow a deterministic trend.
+  - Both **demand** levels and **churn rates** are random variables.
+- A distributional model like BG/NBD describes the random processes that influence the customer behavior, individually and in aggregate.
+- Beta Geometric Negative Binomial Distribution or BG/NBD model is based on the original Pareto/NBD model for CLV which was formulated by Schmittlein, Morrison, and Colombo in 1987.
+- The method relies on four distributional assumptions to model the uncertainties:
+  - Assumption 1: The **number of orders** a customer will place in a time period follows a **Poisson** distribution with transaction rate `lambda`.
+    - This Poisson count distribution is equivalent to the assumption that the time between transactions follows an exponential distribution with the same transaction rate lambda.
+  - Assumption 2:The **demand varies** independently between customers: heterogeneity in `lambda`.
+    - The variation in lambda is a random variable that follows a **Gamma** distribution with shape parameter `r` and scale `alpha`.
+  - Assumption 3:After any purchase, a customer may become inactive with probability `p` and turns away from the business.
+    - The churn risk follows a **Geometric** distribution.
+  - Assumption 4:The **churn risk varies** independently between customers: heterogeneity in `p`.
+    - The variation of the churn or dropout probability `p` is a random variable that follows a **Beta** distribution.
+- The assumption 1 & 2 combine to form a Poisson-Gamma mixture distribution. If the lambda rate is a Gamma random variable, then the mixture distribution is equal to a Negative binomial distribution — Wikipedia.
+
+```Python
+# BG/NBD model
+bgf = BetaGeoFitter(penalizer_coef=1e-06)
+bgf.fit(
+        frequency = df_rfmt["frequency"],
+        recency = df_rfmt["recency"],
+        T = df_rfmt["T"],
+        weights = None,
+        verbose = True,
+        tol = 1e-06
+)
+```
+
+#### Number of Order Prediction (up to time t)
+
+- Use the BG/NBD model data to predict the number of purchases each customer will make in some forthcoming periods.
+
+```Python
+# predict for single customer
+# predict purchases for a selected customer for t days
+t = 30
+cust_id = 12748
+
+df_rfmt_C = df_rfmt.loc[cust_id,:]
+pred_C = bgf.predict(t,
+                    df_rfmt_C["frequency"],
+                    df_rfmt_C["recency"],
+                    df_rfmt_C["T"])
+print(f"customer_id={cust_id}: expected number of purchases within {t} days = {pred_C:.1f}")
+
+# customer_id=12748: expected number of purchases within 30 days = 7.7
+```
+
+- Predict for all the customer in the dataset
+
+```Python
+def predict_purch(df, t):
+    # predict each customer's purchases over next t days
+    df[f"predict_purch_{t}" ] = \
+            bgf.predict(
+                t,
+                df["frequency"],
+                df["recency"],
+                df["T"])
+    return df
+# get the expected purchase volume over 10, 30, 60, and 90 days.
+for t in [10,30,60,90]:
+    df_rfmt = predict_purch(df_rfmt, t)
+```
+
+- Plot the distribution regarding the number of purchases over the next 90 days
+
+```Python
+sns.histplot(df_rfmt['predict_purch_90'], kde=True, bins=50).set_xlim(0,8);
+```
+
+<p align="center"><img src='../../assets/img/predict_purch_90.png'  width=400></p>
+
+#### Customer Churn Probability Prediction
+
+```Python
+# probability that a customer is alive for each customer in dataframe
+prob_alive = bgf.conditional_probability_alive(
+        frequency = df_rfmt["frequency"],
+        recency = df_rfmt["recency"],
+        T = df_rfmt["T"])
+
+df_rfmt["prob_alive"] = prob_alive
+```
+
+- Let’s examine customer ID = 15107, with a prob_alive of 75% by looking at all his or her transactions & make use of `plot_history_alive` in `lifetimes` package's plotting
+
+```Python
+customer_id = 15107
+# filter only the transactions of customer_id = 15107
+df_c_15107 = df_orders[df_orders["customer_id"]==15107]
+
+from lifetimes.plotting import plot_history_alive
+
+# history of the selected customer: probability over time of being alive
+fig = plt.figure(figsize=(20,4))
+span_days = 373
+plot_history_alive(
+                    model = bgf,
+                    t=span_days,
+                    transactions = df_c_15107,
+                    datetime_col = "invoice_date");
+```
+
+<p align="center"><img src='../../assets/img/alive_prob_over_the_time.png'  width=800></p>
+
+- Customer 12347 from our original dataset, we can see that they’ve placed 6 orders since they were first acquired on 2010-12-07 about 365 days ago.
+- The alive probability is decreasing over the time, starting from 1.0 to 0.75
+
+#### Model Visualization
+
+##### Frequency/Recency Heatmap
+
+- `plot_frequency_recency_matrix()` is to create predictions and visualise once the BG/NBD model has been fitted to the data.
+- The matrix has
+  - The customer’s **recency** on the Y axis
+  - The **frequency** on the X axis
+  - The heatmap component is showing the predicted number of future purchases customers at intersecting points will make in one unit of time.
+- The customers most likely to order are those who’ve placed lots of previous orders and have been seen relatively recently.
+
+```Python
+def plot_freq_rec(t):
+    plt.figure(figsize=(6, 6))
+    plot_frequency_recency_matrix(
+            model = bgf,
+            T = t,
+);
+
+
+# call plotter function for different forecast periods:
+t_list = [10, 90]
+_ = [plot_freq_rec(t) for t in t_list]
+```
+
+<p align="center"><img src='../../assets/img/frequency-recency-heatmap.png'  width=400></p>
+
+- The frequency/recency matrices both show:
+  - With a reddish hot zone in the lower right corner. The shape of the distribution remains constant.
+  - They only differ in their scales on the right-hand side: the number of purchases over a longer or shorter number of days.
+- Each matrix demonstrates that a customer with a high frequency (80 or more transactions ), combined with a long recency (more than 300 days between first and latest transactions), will exhibit the highest propensity for future purchases: orange to red, implying 15 to 25 transactions over the next 90 days.
+
+##### Probability of n_purchases up to time
+
+- `probability_of_n_purchases_up_to_time` computes the average number of transactions per customer within a period of time.
+
+```Python
+def prob_purch(t, n):
+    # probability of n repeat purchases within t days
+    p = bgf.probability_of_n_purchases_up_to_time(t, n)
+    return p
+
+
+  # call helper function: probability of n repeat purchases within t days
+t = 90                  # forecast period, days
+purch = range(0,10)   # number of repeat purchases from 0 to 9
+probs = [prob_purch(t,n) for n in purch]
+
+fig, ax = plt.subplots(figsize=(8,4))
+ax.plot(purch, probs, '-o', color='blue')
+ax.set(xlabel="Avg number of purchases", ylabel="Probability")
+ax.set_xticks(purch)
+plt.show()
+```
+
+<p align="center"><img src='../../assets/img/prob_n_purchases_up_to_time.png'  width=400></p>
 
 ## Reference
 

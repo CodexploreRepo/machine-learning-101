@@ -22,7 +22,7 @@
 
 ### Marketing Science
 
-- [Customer Churn Model](./docs/marketing-science/customer-churn.md)
+- [Customer Churn Model](./docs/marketing-science/customer-churn-non-contractual.md)
 
 ## Statistics
 
