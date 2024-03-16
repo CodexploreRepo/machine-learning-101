@@ -34,8 +34,10 @@ grid_search.best_params_ # {'svr__C': 10000.0, 'svr__kernel': 'linear'}
 
 ### Vocab
 
-- Stochastics: randomness
+- `Stochastics`: randomness
   - For example: k-means is a stochastic algorithm, meaning that it relies on randomness to locate the clusters
+- `Homogeneous` homo- means “same.”
+- `Heterogeneous` hetero- means “different” or “other.”
 
 ### EDA
 
