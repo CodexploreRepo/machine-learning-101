@@ -4,8 +4,9 @@
 
 - Transactional item datasets
 
-  - [ ] [Customer Churn Model: How to calculate CLV using BG/NBD and Gamma-Gamma](https://practicaldatascience.co.uk/data-science/how-to-calculate-clv-using-bgnbd-and-gamma-gamma)
+  - [x] [Customer Churn Model: How to calculate CLV using BG/NBD and Gamma-Gamma](https://practicaldatascience.co.uk/data-science/how-to-calculate-clv-using-bgnbd-and-gamma-gamma)
     - [ ] [Contractual Churn](https://practicaldatascience.co.uk/machine-learning/how-to-create-a-contractual-churn-model)
+      - [ ] [Bank Churn](https://www.kaggle.com/code/youssefyasserali/bank-churn-xgboost-catboost-0-8915-auc)
     - [ ] [Non-contractual Churn](https://practicaldatascience.co.uk/machine-learning/how-to-create-a-non-contractual-churn-model-for-your-ecommerce-site)
   - [ ] [Time Series Forecasting](https://practicaldatascience.co.uk/machine-learning/how-to-create-time-series-sales-forecasts-using-prophet)
   - [ ] [Customer Segmetation: RFM & ABC](https://practicaldatascience.co.uk/data-science/how-to-segment-customers-based-on-their-value-using-rfm-and-abc)
