@@ -11,6 +11,7 @@
 
 ## Model Training
 
+- [Scikit-learn Pipeline and ColumnTransformer](./docs/pipeline_column_transformer.md)
 - [Model Training](./docs/model_training.md)
 - [Hyperparameter Tuning](./docs/hyperparameter_tuning.md)
 
