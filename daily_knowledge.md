@@ -2,6 +2,10 @@
 
 ## Day 3
 
+### Evaluation Metrics
+
+- `auc` (Area under curve) because it performs well with the **imbalanced** data.
+
 ### Sklearn's Pipeline
 
 - `SelectFromModel` transformer based on the feature importance of `RandomForestRegressor` before the final regressor:
