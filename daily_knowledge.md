@@ -2,6 +2,31 @@
 
 ## Day 3
 
+### Ensemble Methods
+
+- Classification: `VotingClassifier` can be used to combine the predictions from multiple classifiers
+  - `voting='soft'`
+
+```Python
+from sklearn.ensemble import VotingClassifier
+
+# Linear model (logistic regression)
+lr = LogisticRegression(warm_start=True, max_iter=400)
+# RandomForest
+rf = RandomForestClassifier()
+# XGB
+xgb = XGBClassifier(tree_method="hist", verbosity=0, silent=True)
+# Ensemble
+lr_xgb_rf = VotingClassifier(estimators=[('lr', lr), ('xgb', xgb), ('rf', rf)],
+                             voting='soft')
+```
+
+- Regression: the prediction value is the mean from different models' predictions
+
+```Python
+predictions = np.mean([model.predict(X_test_pre)[: ,1] for model in models], axis=0)
+```
+
 ### Evaluation Metrics
 
 - `auc` (Area under curve) because it performs well with the **imbalanced** data.
@@ -21,7 +46,6 @@ selector_pipeline = Pipeline([
                 gamma=rnd_search.best_params_["svr__gamma"],
                 kernel=rnd_search.best_params_["svr__kernel"])),
 ])
-
 ```
 
 ### Hyperparameter Tuning
