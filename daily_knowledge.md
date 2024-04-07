@@ -109,6 +109,8 @@ selector_pipeline = Pipeline([
 
 ### Hyperparameter Tuning
 
+- Tips: increase the number of folds in the cross-validation method during Hyperparameter Tuning (for the big dataset) can achieve the higher accuracy
+
 #### Grid Search
 
 - Notice that the value of `C` is the maximum tested value. When this happens you definitely want to launch the grid search again with higher values for `C` (removing the smallest values), because it is likely that higher values of `C` will be better.

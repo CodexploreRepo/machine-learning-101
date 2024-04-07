@@ -13,13 +13,22 @@
 
 - [Project Skeleton](./docs/project_skeleton.md)
 - [Scikit-learn Pipeline and ColumnTransformer](./docs/pipeline_column_transformer.md)
-- [Model Training](./docs/model_training.md)
 - [Hyperparameter Tuning](./docs/hyperparameter_tuning.md)
 
 ## Model
 
-- [Gradient Boosting]
+### Model Type
+
+#### Bagging Method (Sampling with Replacement)
+
+- [Random Forest (Bagging)](./docs/model/random_forest.md)
+
+#### Gradient Boosting Method
+
+- [Gradient Boosting](./docs/model/gradien_boosting.md)
 - [XGBoost](./docs/model/xgboost.md)
+- [Light GBM](./docs/model/lightgbm.md)
+- [Cat Boost](./docs/model/catboost.md)
 
 ### Classification
 
