@@ -362,3 +362,125 @@ X_val_pre  =pd.DataFrame(X_val_pre, columns = column_names)
 ```
 
 ## Model Training
+
+### Baseline Model
+
+- First, we can define the list of models with default parameters
+
+```Python
+random_state = 2024
+model_list = [
+    BernoulliNB(),
+    LogisticRegression(),
+    DecisionTreeClassifier(),
+    RandomForestClassifier(random_state=random_state, max_depth=10, max_features='sqrt', n_estimators=300),
+    AdaBoostClassifier(DecisionTreeClassifier(random_state=random_state),random_state=random_state,learning_rate=0.5),
+    GradientBoostingClassifier(random_state=random_state, learning_rate=0.2, max_depth=10, n_estimators = 200),
+    CatBoostClassifier(verbose=False),
+    XGBClassifier(verbose=False),
+    LGBMClassifier(verbose=False)
+]
+```
+
+- Define the trainer class to perform the cross validation
+
+```Python
+class Trainer:
+    def __init__(self,
+                 model_list) -> None:
+        self.model_list = model_list
+
+    def fit_and_evaluate(self, X_train, y_train, X_val, y_val, metrics: str, cv: int=5) -> pd.DataFrame:
+        baseline_results = pd.DataFrame(columns=['model_name', f'{metrics}_train_cv', f'{metrics}_val'])
+        for idx in tqdm.tqdm(range(len(model_list))):
+            clf = model_list[idx]
+            # cross_val_score uses the KFold strategy with default parameters for making the train-test splits,
+            # which means splits into consecutive chunks rather than shuffling. -> shuffle=True
+            # Stratified is to ensure the class distribution equal in each fold
+            kfold = StratifiedKFold(n_splits=cv, shuffle=True, random_state=2024)
+            # using cross_val_score
+            # list of "scoring": https://scikit-learn.org/stable/modules/model_evaluation.html#scoring-parameter
+            metrics_train = np.round(
+                            np.mean(
+                                cross_val_score(clf, X_train, y_train,
+                                scoring=metrics, cv=kfold)
+                            ), 3
+                        )
+            # test on val_set
+            clf.fit(X_train, y_train)
+            y_pred_val = clf.predict_proba(X_val)[:, 1]
+            metrics_val = self.cal_metrics(y_val, y_pred_val)
+            baseline_results.loc[len(baseline_results)] = [clf.__class__.__name__, metrics_train, metrics_val]
+        return baseline_results \
+                    .sort_values(by=f'{metrics}_val', ascending=False) \
+                    .set_index('model_name')
+
+    def cal_metrics(self, y, y_pred) -> float:
+        fpr, tpr, thresholds = roc_curve(y, y_pred)
+        return auc(fpr, tpr)
+```
+
+- You can initialise the Trainer class and perform the evaluation
+
+```Python
+base_trainer = Trainer(model_list)
+baseline_results = base_trainer.fit_and_evaluate(X_train_pre, y_train, X_val_pre, y_val, 'roc_auc')
+
+# under-sampling
+X_train_rus, y_train_rus = RandomUnderSampler().fit_resample(X_train_pre, y_train)
+rus_baseline_results = base_trainer.fit_and_evaluate(X_train_rus, y_train_rus, X_val_pre, y_val, 'roc_auc')
+
+# over-sampling
+X_train_smote, y_train_smote = SMOTE().fit_resample(X_train_pre, y_train)
+smote_baseline_results = base_trainer.fit_and_evaluate(X_train_smote, y_train_smote, X_val_pre, y_val, 'roc_auc')
+```
+
+### Evaluation Function
+
+#### Classification
+
+- For classification, we will need to examine the confusion matrix, classification report
+  - Threshold fine-tuning is also needed for the classification problems
+
+```Python
+def evaluate_model(model, X_test, y_test, display_labels: List[str]=['Not exited', 'Exited']):
+
+    y_pred = model.predict(X_test)
+
+    # Confusion matrix
+    cm = confusion_matrix(y_test, y_pred)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=display_labels)
+    disp.plot()
+    plt.show()
+
+    # Precision and recall
+    print(classification_report(y_test, y_pred))
+
+def finetune_threshold(model, X_test, y_test, display_labels: List[str]=['Not exited', 'Exited']):
+    """
+    This function is to fine-tune the threshold based on the G-means
+    """
+     # ROC curve and AUC
+    y_pred_proba = model.predict_proba(X_test)[:, 1]
+    fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
+    roc_auc = auc(fpr, tpr)
+
+    # Find the best threshold: calculate the G-mean for each threshold
+    gmeans = np.sqrt(tpr * (1-fpr))
+    # locate the index of the largest G-mean
+    idx = np.argmax(gmeans)
+    print(f'Best Threshold={thresholds[idx]}, G-Mean={gmeans[idx]:.3f}')
+
+    fig, ax = plt.subplots()
+    ax.scatter(fpr[idx], tpr[idx], marker="*", s=100, label=f'Optimal Threshold (G-mean={gmeans[idx]:.3f})')
+    ax.plot(fpr, tpr, color='darkorange', lw=2, label=f'ROC curve (AUC={roc_auc:.3f})')
+    ax.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+    ax.set(xlim=[0.0, 1.0], ylim=[0.0, 1.05])
+
+    ax.set(xlabel='False Positive Rate', ylabel='True Positive Rate')
+    ax.set_title('Receiver Operating Characteristic')
+    ax.legend(loc="lower right")
+    plt.show()
+```
+
+-

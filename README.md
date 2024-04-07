@@ -18,6 +18,13 @@
 
 ## Model
 
+- [Gradient Boosting]
+- [XGBoost](./docs/model/xgboost.md)
+
+### Classification
+
+- [Classification](./docs/model/classification.md)
+
 ### Regression
 
 ## Application
