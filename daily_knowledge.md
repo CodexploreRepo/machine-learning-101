@@ -4,10 +4,19 @@
 
 ### Ensemble Methods
 
-- Classification: `VotingClassifier` can be used to combine the predictions from multiple classifiers
-  - `voting='soft'`
+- `Voting Ensemble` works by combining the predictions from multiple models.
+  - In the case of **regression**, this involves calculating the average of the predictions from the models.
+  - In the case of **classification**, the predictions for each label are summed and the label with the majority vote is predicted.
+    - **Hard Voting** - Predict the class with the largest sum of votes from models
+    - **Soft Voting** - Predict the class with the largest summed probability from models.
 
 ```Python
+# voting example: regression
+predictions = np.mean([model.predict(X_test_pre)[: ,1] for model in models], axis=0)
+```
+
+```Python
+# voting example: classification
 from sklearn.ensemble import VotingClassifier
 
 # Linear model (logistic regression)
@@ -21,15 +30,65 @@ lr_xgb_rf = VotingClassifier(estimators=[('lr', lr), ('xgb', xgb), ('rf', rf)],
                              voting='soft')
 ```
 
-- Regression: the prediction value is the mean from different models' predictions
-
-```Python
-predictions = np.mean([model.predict(X_test_pre)[: ,1] for model in models], axis=0)
-```
-
 ### Evaluation Metrics
 
 - `auc` (Area under curve) because it performs well with the **imbalanced** data.
+
+### Sklearn's ColumnTransformer
+
+- The `make_column_transformer()` is not recommended to use for building the pipeline as the default naming might not reflect the actual underlying transformation
+  - In below example, we know that `Age` column is processed by pipeline-1 via the transformed column's name `pipeline-1__Age`. However, we do not know what is the transformation method has been applied to the `Age` column, which in this case is bining
+
+```Python
+make_column_transformer(
+            (binning_pipeline(n_bins=5, encode='onehot', bin_strategy='quantile'), ['Age']),
+            (binning_pipeline(n_bins=7, encode='ordinal', bin_strategy='kmeans'), ['CreditScore']),
+            (oh_cat_pipeline, ['Geography', 'Gender', 'HasCrCard', 'IsActiveMember']),
+            (ord_cat_pipeline, ['Tenure', 'NumOfProducts']),
+            (geo_gender_pipeline, ['Geography', 'Gender']), # feature engineering
+            remainder=num_pipeline
+)
+# ['pipeline-1__Age_0.0', 'pipeline-1__Age_1.0',
+#        'pipeline-1__Age_2.0', 'pipeline-1__Age_3.0',
+#        'pipeline-1__Age_4.0', 'pipeline-2__CreditScore',
+#        'pipeline-3__Geography_France', 'pipeline-3__Geography_Germany',
+#        'pipeline-3__Geography_Spain', 'pipeline-3__Gender_Female',
+#        'pipeline-3__Gender_Male', 'pipeline-3__HasCrCard_0.0',
+#        'pipeline-3__HasCrCard_1.0', 'pipeline-3__IsActiveMember_0.0',
+#        'pipeline-3__IsActiveMember_1.0', 'pipeline-4__Tenure',
+#        'pipeline-4__NumOfProducts', 'pipeline-5__GeoGender_FranceFemale',
+#        'pipeline-5__GeoGender_FranceMale',
+#        'pipeline-5__GeoGender_GermanyFemale',
+#        'pipeline-5__GeoGender_GermanyMale',
+#        'pipeline-5__GeoGender_SpainFemale',
+#        'pipeline-5__GeoGender_SpainMale', 'remainder__Balance',
+#        'remainder__EstimatedSalary']
+
+################ Best Practise for ColumnTransformer ################
+ColumnTransformer([
+                ("bin_oh",binning_pipeline(n_bins=5, encode='onehot', bin_strategy='quantile'), ['Age']),
+                ("bin_ord", binning_pipeline(n_bins=7, encode='ordinal', bin_strategy='kmeans'), ['CreditScore']),
+                #(oh_cat_pipeline, make_column_selector(dtype_include='category')),
+                ("cat_oh", oh_cat_pipeline, ['Geography', 'Gender', 'HasCrCard', 'IsActiveMember']),
+                ("cat_ord",ord_cat_pipeline, ['Tenure', 'NumOfProducts']),
+                ("concat", geo_gender_pipeline, ['Geography', 'Gender'])  # feature engineering
+            ],
+            remainder=num_pipeline
+)
+
+# ['bin_oh__Age_0.0', 'bin_oh__Age_1.0', 'bin_oh__Age_2.0',
+#        'bin_oh__Age_3.0', 'bin_oh__Age_4.0', 'bin_ord__CreditScore',
+#        'cat_oh__Geography_France', 'cat_oh__Geography_Germany',
+#        'cat_oh__Geography_Spain', 'cat_oh__Gender_Female',
+#        'cat_oh__Gender_Male', 'cat_oh__HasCrCard_0.0',
+#        'cat_oh__HasCrCard_1.0', 'cat_oh__IsActiveMember_0.0',
+#        'cat_oh__IsActiveMember_1.0', 'cat_ord__Tenure',
+#        'cat_ord__NumOfProducts', 'concat__GeoGender_FranceFemale',
+#        'concat__GeoGender_FranceMale', 'concat__GeoGender_GermanyFemale',
+#        'concat__GeoGender_GermanyMale', 'concat__GeoGender_SpainFemale',
+#        'concat__GeoGender_SpainMale', 'remainder__Balance',
+#        'remainder__EstimatedSalary']
+```
 
 ### Sklearn's Pipeline
 
@@ -170,7 +229,8 @@ mapping = pd.cut(make_df['mean'], [0, 10**4, 2.5*(10**4), 3.6*(10**4), 5.5*(10**
 - If a categorical attribute has a large number of possible categories (e.g., country code, profession, species), then one-hot encoding will result in a large number of input features.
 - Solution:
   - For example, a country code could be replaced with the country’s population and GDP per capita).
-  - Alternatively, you can use one of the encoders provided by the category_encoders package on GitHub.
+  - Alternatively, you can use one of the encoders provided by the category_encoders package on GitHub such as:
+    - Hash Encoder: for `state`, `city` columns
   - When dealing with neural networks, you can replace each category with a learnable, low-dimensional vector called an embedding. This is an example of representation learning (see Chapters [13](https://learning.oreilly.com/library/view/hands-on-machine-learning/9781098125967/ch13.html#data_chapter) and [17](https://learning.oreilly.com/library/view/hands-on-machine-learning/9781098125967/ch17.html#autoencoders_chapter) for more details).
 
 ##### Rare Category

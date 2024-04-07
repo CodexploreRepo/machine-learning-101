@@ -67,7 +67,7 @@ preprocessing = make_column_transformer(
     (cat_pipeline, make_column_selector(dtype_include="category")),
     remainder='passthrough',   # 'drop' and 'passthrough'
     n_jobs=-1)          # n_job = -1 means that we'll be using all processors to run in parallel.
-)
+    )
 )
 ```
 
@@ -86,6 +86,60 @@ column_names = preprocessing.get_feature_names_out()
 
 X_train_pre =pd.DataFrame(X_train_pre, columns=column_names)
 X_val_pre  = pd.DataFrame(X_val_pre, columns = column_names)
+```
+
+- Note 1: the `make_column_transformer()` is not recommended to use for building the pipeline as the default naming might not reflect the actual underlying transformation
+  - In below example, we know that `Age` column is processed by pipeline-1 via the transformed column's name `pipeline-1__Age`. However, we do not know what is the transformation method has been applied to the `Age` column, which in this case is bining
+
+```Python
+make_column_transformer(
+            (binning_pipeline(n_bins=5, encode='onehot', bin_strategy='quantile'), ['Age']),
+            (binning_pipeline(n_bins=7, encode='ordinal', bin_strategy='kmeans'), ['CreditScore']),
+            (oh_cat_pipeline, ['Geography', 'Gender', 'HasCrCard', 'IsActiveMember']),
+            (ord_cat_pipeline, ['Tenure', 'NumOfProducts']),
+            (geo_gender_pipeline, ['Geography', 'Gender']), # feature engineering
+            remainder=num_pipeline
+)
+# ['pipeline-1__Age_0.0', 'pipeline-1__Age_1.0',
+#        'pipeline-1__Age_2.0', 'pipeline-1__Age_3.0',
+#        'pipeline-1__Age_4.0', 'pipeline-2__CreditScore',
+#        'pipeline-3__Geography_France', 'pipeline-3__Geography_Germany',
+#        'pipeline-3__Geography_Spain', 'pipeline-3__Gender_Female',
+#        'pipeline-3__Gender_Male', 'pipeline-3__HasCrCard_0.0',
+#        'pipeline-3__HasCrCard_1.0', 'pipeline-3__IsActiveMember_0.0',
+#        'pipeline-3__IsActiveMember_1.0', 'pipeline-4__Tenure',
+#        'pipeline-4__NumOfProducts', 'pipeline-5__GeoGender_FranceFemale',
+#        'pipeline-5__GeoGender_FranceMale',
+#        'pipeline-5__GeoGender_GermanyFemale',
+#        'pipeline-5__GeoGender_GermanyMale',
+#        'pipeline-5__GeoGender_SpainFemale',
+#        'pipeline-5__GeoGender_SpainMale', 'remainder__Balance',
+#        'remainder__EstimatedSalary']
+
+################ Best Practise for ColumnTransformer ################
+ColumnTransformer([
+                ("bin_oh",binning_pipeline(n_bins=5, encode='onehot', bin_strategy='quantile'), ['Age']),
+                ("bin_ord", binning_pipeline(n_bins=7, encode='ordinal', bin_strategy='kmeans'), ['CreditScore']),
+                #(oh_cat_pipeline, make_column_selector(dtype_include='category')),
+                ("cat_oh", oh_cat_pipeline, ['Geography', 'Gender', 'HasCrCard', 'IsActiveMember']),
+                ("cat_ord",ord_cat_pipeline, ['Tenure', 'NumOfProducts']),
+                ("concat", geo_gender_pipeline, ['Geography', 'Gender'])  # feature engineering
+            ],
+            remainder=num_pipeline
+)
+
+# ['bin_oh__Age_0.0', 'bin_oh__Age_1.0', 'bin_oh__Age_2.0',
+#        'bin_oh__Age_3.0', 'bin_oh__Age_4.0', 'bin_ord__CreditScore',
+#        'cat_oh__Geography_France', 'cat_oh__Geography_Germany',
+#        'cat_oh__Geography_Spain', 'cat_oh__Gender_Female',
+#        'cat_oh__Gender_Male', 'cat_oh__HasCrCard_0.0',
+#        'cat_oh__HasCrCard_1.0', 'cat_oh__IsActiveMember_0.0',
+#        'cat_oh__IsActiveMember_1.0', 'cat_ord__Tenure',
+#        'cat_ord__NumOfProducts', 'concat__GeoGender_FranceFemale',
+#        'concat__GeoGender_FranceMale', 'concat__GeoGender_GermanyFemale',
+#        'concat__GeoGender_GermanyMale', 'concat__GeoGender_SpainFemale',
+#        'concat__GeoGender_SpainMale', 'remainder__Balance',
+#        'remainder__EstimatedSalary']
 ```
 
 ### Column Selector
