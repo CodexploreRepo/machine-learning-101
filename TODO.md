@@ -33,4 +33,5 @@
 
 ## Done ✓
 
+- [x] Current notebook: [Bank Churn Binary Classification](./notebooks/project/classification/bank-churn-binary-classification.ipynb)
 - [x] Create my first TODO.md

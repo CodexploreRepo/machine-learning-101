@@ -482,5 +482,3 @@ def finetune_threshold(model, X_test, y_test, display_labels: List[str]=['Not ex
     ax.legend(loc="lower right")
     plt.show()
 ```
-
--

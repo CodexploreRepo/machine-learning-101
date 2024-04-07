@@ -14,6 +14,7 @@
 - [Project Skeleton](./docs/project_skeleton.md)
 - [Scikit-learn Pipeline and ColumnTransformer](./docs/pipeline_column_transformer.md)
 - [Hyperparameter Tuning](./docs/hyperparameter_tuning.md)
+- [Model Explainability](./docs/model/model_explainability.md)
 
 ## Model
 
@@ -21,7 +22,7 @@
 
 #### Bagging Method (Sampling with Replacement)
 
-- [Random Forest (Bagging)](./docs/model/random_forest.md)
+- [Random Forest](./docs/model/random_forest.md)
 
 #### Gradient Boosting Method
 
