@@ -269,5 +269,5 @@ y_test  = np.log1p(df_test.price.values)
 
 #### Binary Classification
 
-- If the target is **skewed** (class 0 dominates class 1) &#8594; the best metric for this binary classification problem would be `Area Under the ROC Curve (AUC)``.
+- If the target is **skewed** (class 0 dominates class 1) &#8594; the best metric for this binary classification problem would be `Area Under the ROC Curve (AUC)`.
   - We can use precision and recall too, but AUC combines these two metrics.
