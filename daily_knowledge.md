@@ -2,6 +2,11 @@
 
 ## Day 3
 
+### Modeling
+
+- Tree-based models do not require the data in the same scale.
+- Result Reproducibility: validate **mean** performance and **variance** of the model based on **different random seeds**. :star: Higher variance means lower robustness. :star:
+
 ### Ensemble Methods
 
 - `Voting Ensemble` works by combining the predictions from multiple models.
