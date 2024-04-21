@@ -47,6 +47,10 @@
 
 - [Hypothesis Testing](./docs/statistics/hypothesis_testing.md)
 
+## Model Monitoring
+
+- [Drift in ML](./docs/monitoring/drift_in_ml.md)
+
 ## Appendix
 
 - [1. Projects](./docs/projects.md)
