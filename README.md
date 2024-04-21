@@ -49,7 +49,7 @@
 
 ## Model Monitoring
 
-- [Drift in ML](./docs/monitoring/drift_in_ml.md)
+- [Drift in Machine Learning](./docs/monitoring/drift_in_ml.md)
 
 ## Appendix
 
