@@ -37,7 +37,22 @@ lr_xgb_rf = VotingClassifier(estimators=[('lr', lr), ('xgb', xgb), ('rf', rf)],
 
 ### Evaluation Metrics
 
-- `auc` (Area under curve) because it performs well with the **imbalanced** data.
+#### Classification
+
+- `auc` (Area under curve) performs well with the **imbalanced** data in the classification problem.
+- [**Closeness Evaluation Measure**](https://hoxuanvinh.netlify.app/blog/2024-05-17-closeness-evaluation-metric/?fbclid=IwZXh0bgNhZW0CMTEAAR09uFev_5pMlhYSJaGJTH_TZmiv0szH5AJ81vxhIFTBYDXxyAx-Y0wRHOo_aem_AdSZfIZi6JnCvTIKl3rmQLRWJ8yKwiaGOaYRBHrDNA4j991-xjxRj1YGsaM0SncAqXbMZa_nOIbVdQWLLZru7l7l) used for ordinal classification which is a type of classification task whose predicted classes (or categories) have a specific ordering.
+
+#### Regression
+
+- **Mean Absolute Percentage Error (MAPE)**: a measure of prediction accuracy for forecasting methods that is easy to interpret and **independent of the scale of our data** (either two-digit values or six-digit values)
+  - Drawback: we cannot use MAPE if the series contains 0-value it is impossible to calculate the percentage difference from an observed value of 0 because that implies a division by 0.
+- **Mean Squared Error (MSE)**:
+  - In case the series contains 0-value, so we are unable to use MAPE, so MSE is a good option.
+  - In case the prediction range is small (0.1 or 1), and we want to amplify the error using MSE
+  - How to know if the MSE is good or bad ?
+    - For example, for the random walk series with the range varies from -30 to 30. The best forecast produces the MSE exceeds 300. This is an extremely high value considering that our random walk dataset does not exceed the value of 30.
+- **Mean Absolute Error (MAE)**: an easy metrics to interpret, as it returns the average of the absolute difference between the predicted and actual values, instead of a squared difference like the **MSE**.
+  - For example, `MAE=2765` means that the actual prediction will be either above or below the actual value around $2765
 
 ### Sklearn's ColumnTransformer
 
