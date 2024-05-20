@@ -4,6 +4,8 @@
 
 ### EDA
 
+- To check a feature follows the normal distribution, we can use Q-Q plot.
+
 #### Quantile Quantile (Q-Q) plots
 
 - The quantile-quantile (Q-Q) plot is a graphical method for determining if a dataset follows a certain probability distribution or whether two samples of data came from the same population or not.
