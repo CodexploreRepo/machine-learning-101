@@ -1,5 +1,41 @@
 # Machine Learning 101
 
+## Day 4
+
+### EDA
+
+#### Quantile Quantile (Q-Q) plots
+
+- The quantile-quantile (Q-Q) plot is a graphical method for determining if a dataset follows a certain probability distribution or whether two samples of data came from the same population or not.
+  - Q-Q plots are particularly useful for assessing whether a dataset is normally distributed or if it follows some other known distribution.
+
+```Python
+
+import numpy as np
+import matplotlib.pyplot as plt
+import scipy.stats as stats
+
+# Generate example of normal distribution data
+np.random.seed(0)
+data = np.random.normal(loc=0, scale=1, size=1000)
+
+# Create Q-Q plot
+stats.probplot(data, dist="norm", plot=plt)
+plt.title('Normal Q-Q plot')
+plt.xlabel('Theoretical quantiles')
+plt.ylabel('Ordered Values')
+plt.grid(True)
+plt.show()
+```
+
+| Q-Q plot of a dataset that is very close to a normal distribution |    Q-Q plot of a dataset that is not close to a normal distribution.     |
+| :---------------------------------------------------------------: | :----------------------------------------------------------------------: |
+|   ![](./assets/img/qq-plot-randomly-distributed-residuals.png)    | ![](./assets/img/qq-plot-residuals-not-close-to-normal-distribution.png) |
+
+- The Q-Q plot is constructed by plotting the quantiles of our residuals on the y-axis against the quantiles of a theoretical distribution, in this case the normal distribution, on the x-axis.
+  - If both distributions are similar, meaning that the distribution of the residuals is close to a normal distribution, the Q-Q plot will display a straight line that approximately lies on $y = x$.
+  - If both distributions are not similar, meaning that the distribution of the residuals is not close to a normal distribution, the Q-Q plot will generate the curve that departs from $y = x$.
+
 ## Day 3
 
 ### Modeling
