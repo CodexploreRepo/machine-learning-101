@@ -2,6 +2,17 @@
 
 ## Day 4
 
+### Data Pre-processing
+
+#### Scaling vs Normalising
+
+- Scaling and normalization can be confusing terms for data scientists, as they are often used interchangeably.
+- **Scaling**: the data affects only its _scale_ and _not its distribution_.
+  - It simply forces the values into a certain range
+- **Normalizing**: affects its distribution and its scale & would force it to have a normal distribution or a Gaussian distribution.
+  - Normalizing the data is only useful when the models we use require the data to be normal.
+  - For example, linear discriminant analysis (LDA) is derived from the assumption of a normal distribution, so it is better to normalize data before using LDA.
+
 ### EDA
 
 - To check a feature follows the normal distribution, we can use Q-Q plot.
