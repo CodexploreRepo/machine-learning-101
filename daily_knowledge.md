@@ -1,5 +1,21 @@
 # Machine Learning 101
 
+## Day 5
+
+### SHAP - Explainability
+
+- SHAP is the most powerful Python package for understanding and debugging your models.
+- SHAP value's Understanding:
+  - For regression, SHAP value is interpreted as
+    $$f(x)=E[f(x)] + \text{SHAP values}$$
+  - For classification, SHAP value is interpreted as
+    - **Log odds of the positive class** for the **binary** targets:
+      $$f(x) = f(ln({\frac{P}{1-P}})) = E[ln({\frac{P}{1-P}})] + \text{SHAP values}$$
+    - **Soft max** for the **multi-class** targets: need to softmax the $f(x)$ values for each class to get the original prediction probabiliy.
+  - Note:
+    - $E[f(x)]$ gives the average value of all the prediction.
+    - $f(x)$ gives the predicted value for a particular observation
+
 ## Day 4
 
 ### Data Pre-processing

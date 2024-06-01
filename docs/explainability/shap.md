@@ -2,8 +2,9 @@
 
 ## Introduction
 
+- SHAP (SHapley Additive exPlanations), originally created in 2017, has been designed, using the game theory, to identify what is the marginal contribution of each feature within the model.
 - SHAP is the most powerful Python package for understanding and debugging your models.
-- SHAP value's Understanding:
+- Explain the SHAP for a single prediction $f(x)$
   - For regression, SHAP value is interpreted as
     $$f(x)=E[f(x)] + \text{SHAP values}$$
   - For classification, SHAP value is interpreted as
@@ -36,12 +37,16 @@ X_transformed_df.shape
 
 ### SHAP Explainer & SHAP Values
 
+- Note: Create SHAP Explainer & SHAP values **based on the training set**
 - SHAP's Explainer receives the model and calculate SHAP values for every observation in the feature
   - `shap.Explainer`
   - `shap.TreeExplainer`: The tree based machine learning model that we want to explain. XGBoost, LightGBM, CatBoost, Pyspark and most tree-based scikit-learn models
 
 ```Python
 import shap
+# load JS visualization code to notebook
+shap.initjs()
+
 # explainer = shap.Explainer(model)
 explainer = shap.TreeExplainer(model)
 ```

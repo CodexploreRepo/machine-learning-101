@@ -1,20 +1,29 @@
 # Advanced Machine Learning
 
-## Data Cleaning
+## Machine Learning Lifecycle
+
+### Data Cleaning
 
 - [EDA](./docs/eda.md)
 - [Outlier Removal](./docs/outlier_removal.md)
 
-## Data Pre-processing
+### Data Pre-processing
 
 - [Categorical Encoding](./docs/categorical_encoding.md)
 
-## Model Training
+### Model Training
 
 - [Project Skeleton](./docs/project_skeleton.md)
 - [Scikit-learn Pipeline and ColumnTransformer](./docs/pipeline_column_transformer.md)
 - [Hyperparameter Tuning](./docs/hyperparameter_tuning.md)
-- [Model Explainability](./docs/model/model_explainability.md)
+
+### Model Evaluation
+
+- [Explainability - SHAP](./docs/explainability/shap.md)
+
+### Model Monitoring
+
+- [Drift in Machine Learning](./docs/monitoring/drift_in_ml.md)
 
 ## Model
 
@@ -37,10 +46,6 @@
 
 ### Regression
 
-## Explainability
-
-- [SHAP](./docs/explainability/shap.md)
-
 ## Application
 
 ### Marketing Science
@@ -50,10 +55,6 @@
 ## Statistics
 
 - [Hypothesis Testing](./docs/statistics/hypothesis_testing.md)
-
-## Model Monitoring
-
-- [Drift in Machine Learning](./docs/monitoring/drift_in_ml.md)
 
 ## Appendix
 
