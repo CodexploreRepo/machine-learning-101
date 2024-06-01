@@ -39,6 +39,8 @@
 
 ## Explainability
 
+- [SHAP](./docs/explainability/shap.md)
+
 ## Application
 
 ### Marketing Science
