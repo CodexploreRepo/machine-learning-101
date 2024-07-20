@@ -20,6 +20,8 @@ num_pipeline = Pipeline([
 - If you don’t want to name the transformers, you can use the `make_pipeline()` function instead
 
 ```Python
+from sklearn.pipeline import make_pipeline
+
 num_pipeline = make_pipeline(
                 OutlierRemover(), # custom transformer
                 SimpleImputer(strategy="median"),
@@ -53,7 +55,7 @@ preprocessing = ColumnTransformer([
     ("cat", cat_pipeline, cat_attribs),
     ],
     remainder='passthrough',   # 'drop' and 'passthrough'
-    n_jobs=-1)          # n_job = -1 means that we'll be using all processors to run in parallel.
+    n_jobs=-1          # n_job = -1 means that we'll be using all processors to run in parallel.
 )
 ```
 
