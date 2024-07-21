@@ -5,6 +5,7 @@ hyperopt
 optuna
 # Model
 scikit-learn
+lightgbm
 xgboost
 pandas
 matplotlib
