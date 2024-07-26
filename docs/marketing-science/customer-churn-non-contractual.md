@@ -61,15 +61,16 @@
     - For the `customer_id=12347`, `recency` is the number of days between her first (2010-12-07) and her latest transaction (2011-12-07), which is 365 days.
     - A bit counter-intuitively, it does not measure the days since her latest purchase.
 - Example: Below is all the transactions of the single customer where `customer_id=12347`
-  | | customer_id | invoice_date | total_revenue |
-  |------:|--------------:|:---------------|----------------:|
-  | 548 | 12347 | 2010-12-07 | 711.79 |
-  | 2205 | 12347 | 2011-01-26 | 475.39 |
-  | 4942 | 12347 | 2011-04-07 | 636.25 |
-  | 7844 | 12347 | 2011-06-09 | 382.52 |
-  | 10173 | 12347 | 2011-08-02 | 584.91 |
-  | 15066 | 12347 | 2011-10-31 | 1294.32 |
-  | 18367 | 12347 | 2011-12-07 | 224.82 |
+
+  |       | customer_id | invoice_date | total_revenue |
+  | ----: | ----------: | :----------- | ------------: |
+  |   548 |       12347 | 2010-12-07   |        711.79 |
+  |  2205 |       12347 | 2011-01-26   |        475.39 |
+  |  4942 |       12347 | 2011-04-07   |        636.25 |
+  |  7844 |       12347 | 2011-06-09   |        382.52 |
+  | 10173 |       12347 | 2011-08-02   |        584.91 |
+  | 15066 |       12347 | 2011-10-31   |       1294.32 |
+  | 18367 |       12347 | 2011-12-07   |        224.82 |
 
 - Calculate the RFMT values manually for a single customer
 
