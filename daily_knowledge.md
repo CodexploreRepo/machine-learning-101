@@ -1,5 +1,16 @@
 # Machine Learning 101
 
+## Day 6
+
+### RFM
+
+#### BG-NBD Model
+
+##### Problem with `conditional_probability_alive()` for case when frequency=0
+
+- [Issue](https://github.com/CamDavidsonPilon/lifetimes/issues/165): There is a problem with BG-NBD model's `conditional_probability_alive()` is that for users that have no frequency (one-time purchasers), the prob_alive is always 1 or $P(alive | freq=0) = 1$.
+- Solution: The [ModifiedBetaGeo](https://github.com/CamDavidsonPilon/lifetimes/blob/master/lifetimes/fitters/modified_beta_geo_fitter.py) model "fixes" this by giving a non trivial probability to those with a single purchase. We can see what this means by looking at the code for conditional_probability_alive.
+
 ## Day 5
 
 ### SHAP - Explainability
@@ -111,12 +122,13 @@ lr_xgb_rf = VotingClassifier(estimators=[('lr', lr), ('xgb', xgb), ('rf', rf)],
 
 - **Mean Absolute Percentage Error (MAPE)**: a measure of prediction accuracy for forecasting methods that is easy to interpret and **independent of the scale of our data** (either two-digit values or six-digit values)
   - Drawback: we cannot use MAPE if the series contains 0-value it is impossible to calculate the percentage difference from an observed value of 0 because that implies a division by 0.
-- **Mean Squared Error (MSE)**:
+- **Mean Squared Error (MSE) or Root MSE**:
   - In case the series contains 0-value, so we are unable to use MAPE, so MSE is a good option.
-  - In case the prediction range is small (0.1 or 1), and we want to amplify the error using MSE
+  - When to use: In case the prediction range is small (0.1 or 1), and we want to **amplify the error** using MSE
   - How to know if the MSE is good or bad ?
     - For example, for the random walk series with the range varies from -30 to 30. The best forecast produces the MSE exceeds 300. This is an extremely high value considering that our random walk dataset does not exceed the value of 30.
 - **Mean Absolute Error (MAE)**: an easy metrics to interpret, as it returns the average of the absolute difference between the predicted and actual values, instead of a squared difference like the **MSE**.
+  - When to use: In case the data have quite a number of long tails, the model prediction is far off actual values for certain data points, then if we use MSE or RMSE, square such errors giving the resulted metrics are very high, and it might not reflect the entire holdout set error.
   - For example, `MAE=2765` means that the actual prediction will be either above or below the actual value around $2765
 
 ### Sklearn's ColumnTransformer

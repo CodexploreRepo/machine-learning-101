@@ -237,6 +237,13 @@ plt.show()
 - To conveniently model a deactivation, we can assume that the _deactivation can only happen after a successful purchase_.
   - That is to say, after every purchase in your store, a customer will decide whether he’ll continue buying at your shop or to abandon it.
 
+### Probability Alive
+
+#### Problem: `conditional_probability_alive()` for case when frequency=0
+
+- [Issue](https://github.com/CamDavidsonPilon/lifetimes/issues/165): There is a problem with BG-NBD model's `conditional_probability_alive()` is that for users that have no frequency (one-time purchasers), the prob_alive is always 1 or $P(alive | freq=0) = 1$.
+- Solution: The [ModifiedBetaGeo](https://github.com/CamDavidsonPilon/lifetimes/blob/master/lifetimes/fitters/modified_beta_geo_fitter.py) model "fixes" this by giving a non trivial probability to those with a single purchase. We can see what this means by looking at the code for conditional_probability_alive.
+
 ## Todo
 
 - [Modeling Customer Lifetime Values with Lifetimes](https://www.aliz.ai/en/blog/part-2-modeling-customer-lifetime-values-with-lifetimes)
