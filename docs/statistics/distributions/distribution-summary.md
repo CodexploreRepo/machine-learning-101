@@ -26,6 +26,8 @@
 
 ## Discrete
 
+### Discrete Uniform Distribution
+
 ### Shifted Geometric Distribution vs Geometric Distribution
 
 - The geometric distribution is either one of 2 discrete probability distributions:
@@ -57,6 +59,13 @@
 <p align="center"><img src="../../../assets/img/poisson-approximation-for-binomial-distribution.png" width=800></p>
 
 ## Continuous
+
+### Continuous Uniform Distribution
+
+- The bounds are defined by the parameters $a$, $b$ which are the minimum and maximum values.
+- The interval can either be closed $[a,b]$ or open $(a,b)$
+
+<p align="center"><img src="../../../assets/img/continuous-uniform-distribution.png" width=200></p>
 
 ### Exponential vs Geometric Distribution
 
