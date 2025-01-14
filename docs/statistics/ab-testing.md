@@ -37,9 +37,10 @@
   - The **two–sample t–test** is one of the most commonly used hypothesis tests. It is applied to **compare** whether the **average difference** between the two groups.
 
 <p align="center"><img src="../../assets/img/statistical-significance-p-value.png" width=500><br>Statistical Significance & P-Value</p>
+
 - Hypothesis tests: Frequentists vs. Bayesians
   - Frequentist statistics uses hypotheses tests which are based on defining two hypotheses, the null and the alternative hypotheses (or H0 and H1) which are mutually exclusive:
   - [Read more](https://www.linkedin.com/pulse/hypothesis-tests-frequentists-vs-bayesians-miguel-pereira-md-phd/)
 - [A/B testing example](https://github.com/renatofillinich/ab_test_guide_in_python/blob/master/AB%20testing%20with%20Python.ipynb)
   - [Confidence Interval](https://medium.com/@ibtesamahmex/confidence-intervals-and-how-to-find-them-42fe4e0900c3)
-- [Baysian A/b testing](https://medium.com/@ibtesamahmex/beginners-guide-to-bayesian-ab-testing-22f40988d5e6)
+- [Baysian A/B testing](https://medium.com/@ibtesamahmex/beginners-guide-to-bayesian-ab-testing-22f40988d5e6)

@@ -297,6 +297,67 @@ mapping = pd.cut(make_df['mean'], [0, 10**4, 2.5*(10**4), 3.6*(10**4), 5.5*(10**
 
 ### Data Pre-processing
 
+#### Outlier Removal
+
+- For the right-skew dataset where There are an extreme increase from the 99th percentile (2.2363) to the 100th (196)percentile, we can define IQR range = Q3 (quantile=0.99) - Q1 (quantile=0.01), instead of Q3=0.75 and Q1=0.25
+
+```Python
+# count    7933.000000
+# mean        0.125359
+# std         2.602527
+# min         0.000000
+# 0%          0.000000
+# 5%          0.000000
+# 50%         0.000000
+# 95%         0.000000
+# 99%         2.233600
+# 100%      196.010000
+# max       196.010000
+
+
+class OutlierHandler():
+    def __init__(self):
+        pass
+    def get_outlier_thresholds(self, df, col_name, lower_quantile=0.25, upper_quantile=0.75):
+        """
+        Calculate the lower and upper outlier thresholds for a given variable in the dataframe.
+
+        Parameters:
+            dataframe (pandas.DataFrame): The dataframe containing the variable.
+            variable (str): The name of the variable for which outlier thresholds will be calculated.
+
+        Returns:
+            tuple: A tuple containing the lower and upper outlier thresholds.
+        """
+        quartile_1 = df[col_name].quantile(lower_quantile)
+        quartile_3 = df[col_name].quantile(upper_quantile)
+        interquantile_range = quartile_3 - quartile_1
+        up_limit = quartile_3 + 1.5 * interquantile_range
+        low_limit = quartile_1 - 1.5 * interquantile_range
+        return low_limit.round(), up_limit.round()
+
+
+    def replace_with_thresholds(self, df, col_name, low_limit, up_limit):
+        """
+        Replace the outliers in the given variable of the dataframe with the lower and upper thresholds.
+
+        Parameters:
+            dataframe (pandas.DataFrame): The dataframe containing the variable.
+            variable (str): The name of the variable for which outliers will be replaced.
+
+        Returns:
+            None
+        """
+        df.loc[(df[col_name] < low_limit), col_name] = low_limit
+        df.loc[(df[col_name] > up_limit), col_name] = up_limit
+        return df
+out_handler = OutlierHandler()
+# set the IQR range from 0.01 to 0.99 instead of 0.25 to 0.75 percentile
+low_limit, up_limit = out_handler.get_outlier_thresholds(df, "REVENUE", lower_quantile=0.01, upper_quantile=0.99)
+print(low_limit, up_limit)
+df = out_handler.replace_with_thresholds(df, "REVENUE", low_limit, up_limit )
+```
+
 #### Scaler
 
 - There are two common ways to get all attributes to have the same scale:
