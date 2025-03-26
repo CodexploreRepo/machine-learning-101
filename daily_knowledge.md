@@ -1,5 +1,8 @@
 # Machine Learning 101
-
+## Day 7
+### Model Evaluation
+- Regression: Residual Normality
+- Classification: Decile Analysis, Cumulative Gains and Lift Curves
 ## Day 6
 
 ### RFM
