@@ -1,5 +1,17 @@
 # Machine Learning 101
 
+## Day 8
+
+### XGBoost
+
+- Hyper-paramters equivalent from native XGBoost interface (`xgboost.train()`) to the Scikit-learn interface (`xgboost.XGBRegressor`, `xgboost.XGBClassifier`)
+  - `eta` &#8594; `learning_rate`
+  - `lambda` &#8594; `reg_lambda`
+  - `alpha` &#8594; `reg_alpha`
+  - `num_boost_round` &#8594; `n_estimators`: are the number of boosting rounds (trees) and they are functionally equivalent, but for different APIs:
+    - Use `n_estimators` for the Scikit-learn interface (`xgboost.XGBRegressor`, `xgboost.XGBClassifier`).
+    - Use `num_boost_round` for the native XGBoost interface (`xgboost.train()`)
+
 ## Day 7
 
 ### Stratified sampling
@@ -17,6 +29,29 @@ strat_train_set, strat_test_set = train_test_split(
 
 - Regression: Residual Normality
 - Classification: Decile Analysis, Cumulative Gains and Lift Curves
+
+#### Regression
+
+##### Confidence Interval of the Error
+
+```Python
+# compute a 95% confidence interval for the generalization error using scipy.stats.bootstrap().
+# Defines a helper function to compute RMSE from squared errors.
+def rmse_func(squared_errors):
+    return np.sqrt(np.mean(squared_errors))
+
+confidence = 0.95
+squared_errors = (y_pred - y_test) ** 2
+# It performs bootstrap resampling on the squared_errors data (i.e., repeatedly samples with replacement).
+# Each resample is used to compute an RMSE via rmse_func function.
+boot_result = stats.bootstrap([squared_errors], rmse_func,
+                              confidence_level=confidence, random_state=42)
+# After many iterations (by default, 9999), it calculates the confidence interval of the RMSE distribution.
+rmse_lower, rmse_upper = boot_result.confidence_interval
+
+print(f"95% CI for RMSE: [{rmse_lower:.4f}, {rmse_upper:.4f}]")
+
+```
 
 ## Day 6
 
@@ -135,6 +170,11 @@ lr_xgb_rf = VotingClassifier(estimators=[('lr', lr), ('xgb', xgb), ('rf', rf)],
 
 - `auc` (Area under curve) performs well with the **imbalanced** data in the classification problem.
 - [**Closeness Evaluation Measure**](https://hoxuanvinh.netlify.app/blog/2024-05-17-closeness-evaluation-metric/?fbclid=IwZXh0bgNhZW0CMTEAAR09uFev_5pMlhYSJaGJTH_TZmiv0szH5AJ81vxhIFTBYDXxyAx-Y0wRHOo_aem_AdSZfIZi6JnCvTIKl3rmQLRWJ8yKwiaGOaYRBHrDNA4j991-xjxRj1YGsaM0SncAqXbMZa_nOIbVdQWLLZru7l7l) used for ordinal classification which is a type of classification task whose predicted classes (or categories) have a specific ordering.
+
+##### Multi-Class Classification
+
+- `merror` – Multiclass classification error rate
+- `mlogloss` – Multiclass logloss
 
 #### Regression
 
@@ -445,6 +485,10 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42, shuff
 
 X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, random_state=42, shuffle=True, test_size=0.25) # 0.25 x 0.8 = 0.2
 ```
+
+- Usually, split into train & test sets.
+  - For train set, can use cross-validation to perform the hyper-paramter tuning
+    - Note 1: if Poor test generalization after tuning, Revert to default hyper-parameters.
 
 #### Regression
 

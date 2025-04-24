@@ -109,17 +109,65 @@ clf_xgb.fit(X_train,
 model = clf_xgb.get_booster()
 ```
 
+## Cross-Validation
+
+- During cross-validation, we are asking XGBoost to watch three classification metrics which report model performance from three different angles.
+
+```Python
+# Encode y to numeric
+y_encoded = OrdinalEncoder().fit_transform(y)
+
+# Extract text features
+cats = X.select_dtypes(exclude=np.number).columns.tolist()
+
+# Convert to pd.Categorical
+for col in cats:
+   X[col] = X[col].astype('category')
+
+# Split the data
+X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, random_state=1, stratify=y_encoded)
+
+# Create classification matrices
+dtrain_clf = xgb.DMatrix(X_train, y_train, enable_categorical=True)
+dtest_clf = xgb.DMatrix(X_test, y_test, enable_categorical=True)
+
+# This multi:softprob objective also requires the number of classes num_class
+params = {"objective": "multi:softprob",
+          "num_class": 5,
+          "tree_method": "gpu_hist"
+}
+n = 1000
+
+results = xgb.cv(
+   params, dtrain_clf,
+   num_boost_round=n,
+   nfold=5,
+   metrics=["mlogloss", "auc", "merror"],
+)
+```
+
+- To see the best AUC score, we take the maximum of `test-auc-mean` column:
+
+```Python
+# It has the same number of rows as the number of boosting rounds
+# Each row is the average metrics of all splits (folds) for that round.
+# to get best number of boosting round (before early stopping)
+best_num_boost_round = results.shape[0]
+best_auc = results['test-auc-mean'].max()
+```
+
 ## Hyper-parameter Space
 
+- Reference: [XGBoost's parameters](https://xgboost.readthedocs.io/en/stable/parameter.html)
 - `booster` [default=gbtree]: This parameter basically selects the type of model to run at each iteration, which gives 2 options
   - `gbtree`: tree-based models
   - `gblinear`: linear models.
-- `n_estimators` (for the Scikit-learn interface) number of trees (a.k.a `num_boost_round` for or the native XGBoost interface).
+- `num_boost_round` (for the native XGBoost interface) (a.k.a `n_estimators` for the Scikit-learn interface) number of trees)
   - The more trees you have, the more reliable your predictions will be, but need to use with `early_stopping_rounds` during `.fit()` to prevent overfitting.
   - How many trees should you pick?
     - Quick result: limit the number of trees to around 200.
     - Model only runs once a week: up to 5,000 trees.
-- `learning_rate` regulates how much each tree contributes to the final prediction. The more trees you have, the smaller the learning rate should be.
+- `eta` regulates how much each tree contributes to the final prediction. The more trees you have, the smaller the learning rate should be.
   - Range: between 0.001 and 0.1.
 - `max_depth` decides the complexity of each tree in your model & refers to the maximum depth that a tree can grow to.
   - Range: 1 to 10
@@ -133,6 +181,13 @@ model = clf_xgb.get_booster()
     - a lower value indicates that only a subset of features will be randomly chosen before building each tree.
 - `min_child_weight` sets the minimum sum of instance weights that must be present in a child node in each tree.
   - Range: 1 to 20
+- **Note**: hyper-paramters equivalent from native XGBoost interface (`xgboost.train()`) to the Scikit-learn interface (`xgboost.XGBRegressor`, `xgboost.XGBClassifier`)
+  - `eta` &#8594; `learning_rate`
+  - `lambda` &#8594; reg_lambda
+  - `alpha` &#8594; `reg_alpha`
+  - `num_boost_round` &#8594; `n_estimators`: are the number of boosting rounds (trees) and they are functionally equivalent, but for different APIs:
+    - Use `n_estimators` for the Scikit-learn interface (`xgboost.XGBRegressor`, `xgboost.XGBClassifier`).
+    - Use `num_boost_round` for the native XGBoost interface (`xgboost.train()`)
 
 ```Python
 def objective(trial):
