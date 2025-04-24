@@ -264,7 +264,8 @@ selector_pipeline = Pipeline([
 
 ### Hyperparameter Tuning
 
-- Tips: increase the number of folds in the cross-validation method during Hyperparameter Tuning (for the big dataset) can achieve the higher accuracy
+- Tip 1: increase the number of folds in the cross-validation method during Hyperparameter Tuning (for the big dataset) can achieve the higher accuracy
+- Tip 2: XGBoost & LGBM tuning `eta` (`learning_rate`) needs to keep track the best `num_boosting_round` (`n_estimators`) (best=number of boosting round before early stopping happens)
 
 #### Grid Search
 
