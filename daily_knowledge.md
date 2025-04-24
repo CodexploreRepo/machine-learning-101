@@ -1,8 +1,23 @@
 # Machine Learning 101
+
 ## Day 7
+
+### Stratified sampling
+
+- For example, the US population is 51.1% females and 48.9% males, so a well-conducted survey, say select 1,000 people that are representative of the whole U.S population, we would try to maintain this ratio in the sample: 511 females and 489 males (at least if it seems possible that the answers may vary across genders).
+- This is called stratified sampling: the population is divided into homogeneous subgroups called `strata`, and the right number of instances are sampled from each stratum to guarantee that the test set is representative of the overall population.
+
+```Python
+#  experts who told you that the median income (income_cat) is a very important attribute to predict median housing prices
+strat_train_set, strat_test_set = train_test_split(
+    df, test_size=0.2, stratify=df["income_cat"], random_state=42)
+```
+
 ### Model Evaluation
+
 - Regression: Residual Normality
 - Classification: Decile Analysis, Cumulative Gains and Lift Curves
+
 ## Day 6
 
 ### RFM
@@ -219,6 +234,24 @@ selector_pipeline = Pipeline([
 # params: 'svr__C': [1.0, 3.0, 10., 30., 100., 300., 1000.0]
 # best hyper-params
 grid_search.best_params_ # {'svr__C': 10000.0, 'svr__kernel': 'linear'}
+```
+
+#### Optuna
+
+- `TPESampler` (Tree-structured Parzen Estimator Sampler) is a smarter way of selecting hyperparameters compared to **random** search.
+  - Instead of picking parameters randomly, it uses Bayesian Optimization to sample promising hyperparameter sets based on past trials.
+  - `n_startup_trials=n_startup_trials`: The first n_startup_trials use random search (to explore different regions of the parameter space). After that, TPESampler exploits the best-performing areas.
+
+```Python
+# Optuna study
+study = optuna.create_study(
+    direction="minimize",  # We want to minimize RMSE
+      # uses Bayesian Optimization to sample promising hyperparameter sets based on past trials.
+    sampler=optuna.samplers.TPESampler(seed=42,
+                                        # The first n_startup_trials use random search (to explore different regions of the parameter space).
+                                        n_startup_trials=n_startup_trials),
+)
+study.optimize(objective, n_trials=n_trial)
 ```
 
 ### Vocab

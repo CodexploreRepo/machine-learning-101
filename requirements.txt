@@ -18,3 +18,7 @@ tabulate
 tqdm
 openpyxl 
 lifetimes
+# feature engineering
+h3 
+h3-py
+geopandas

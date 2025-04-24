@@ -3,6 +3,10 @@
 ## Introduction
 
 - eXtreme Gradient Boosting (XGBoost) is a scalable and improved version of the gradient boosting algorithm (terminology alert) designed for efficacy, computational speed and model performance.
+- Model Usage: regression, classification, and ranking problems.
+- Model Architecture:
+  - **Sequential Learning**: XGBoost commonly uses decision trees as its foundational learning. Each subsequent tree is constructed on the previous one's errors, with a focus on misclassified data points. The approach use gradient descent to find the optimal weights for each tree while minimizing the loss function.
+  - **Ensemble**: XGBoost generates an ensemble of decision trees and combines their predictions to improve overall accuracy. The final forecast is a weighted sum of all the trees' predictions and weighted based on performance.
 - Some of the advantages of using XGBoost over Gradient Boosting are:
   - **Regularization:** - XGBoost Incorporates both L1 (LASSO) and L2 (Ridge) regularization terms in the objective function, providing better control over model complexity.
   - **Parallelization:** XGBoost is optimized for parallel computing, making it more efficient and scalable. This is achieved through parallel tree construction, which is particularly beneficial for large datasets.
@@ -10,34 +14,111 @@
   - **Tree Pruning:** XGBoost utilizes "max_depth" and "min_child_weight" parameters during tree construction to control the depth and size of trees, enabling more effective pruning.
   - **Cross-validation:** XGBoost has built-in cross-validation capabilities, simplifying the model selection process while cross-validation in gradient boosting needs to be implemented separately.
 
-## Code Usage
+## How XGboost works
 
-- **Objective**: The two most popular classification objectives are:
+- XGBoost builds an **ensemble** of decision trees, where each tree learns from the errors of the previous trees, and together they create a powerful and accurate predictive model.
+- The process of learning from errors and building more trees continues until the model is robust and performs well on new data.
+  - **Step 1 - Initialization**: We start with an initial guess for the predictions $F_1(X)$. This can be a simple value like the average of the target values (for regression) or the most common class (for classification).
+  - **Step 2 - Calculate Errors**: We calculate the errors between our initial predictions and the actual target values in the training data. $r_1= \text{error metrics} (Y, F_1(X))$
+  - **Step 3 - Build a Tree to correct Errors**: Now, we create a decision tree to correct these errors. The tree tries to find patterns in the data that help us make better predictions. $h_1(X, r_1)$
+    - $h$ is a function trained to predict the residuals
+  - **Step 4 - Update Predictions**: We use the newly created tree to update our predictions.
+    - $F_2(X) = F_1(X) + \alpha h_1(X, r_1) $
+    - The tree's predictions are combined with the previous predictions, giving more weight to the tree's predictions when they are more accurate.
+  - **Step 5 - Repeat for More Trees**: We repeat Steps 2 to 4 to create more trees.
+    - Each new tree focuses on correcting the errors that the previous trees couldn't handle.
+  - **Step 6 - Stop When Ready**: we repeat this process for a certain number of rounds (boosting rounds) or until the model performs well enough. We want to avoid overfitting, so we stop when the model reaches a satisfactory level of accuracy.
+  - **Step 7 - Make Predictions**: once the training is complete, we have a collection of trees that work together to make predictions on new, unseen data. To make a prediction, we pass the new data through each tree, and their combined predictions give us the final result.
+
+<p align="center"><img src='../../assets/img/ilustration-of-xgboost.png' width=500></p>
+
+## Code Usage: XGBoost Native vs. XGBoost Sklearn API
+
+- **Objective**: The learning task parameters define the goal of optimization and the metric that will be chosen at each step.
+  - `reg:squarederror` regression problem (`xgb.XGBRegressor(objective ='reg:squarederror'`)
   - `binary:logistic` binary classification (the target contains only two classes, i.e., cat or dog)
-  - `multi:softprob` multi-class classification (more than two classes in the target, i.e., apple/orange/banana)
-- **Early Stopping Round**: when given an unnecessary number of boosting rounds, XGBoost starts to overfit and memorize the dataset. This, in turn, leads to validation performance drop because the model is memorizing instead of generalizing. early_stopping_rounds helps to prevent that.
+  - `multi:softmax` multi-class classification (more than two classes in the target, i.e., apple/orange/banana)
+- **Early Stopping Round**: when given an unnecessary number of boosting rounds, XGBoost starts to overfit and memorize the dataset (say `n_estimators=3000`). This, in turn, leads to validation performance drop because the model is memorizing instead of generalizing. `early_stopping_rounds` helps to prevent that.
   If value of `early_stopping_rounds` is set to 10 then model will stop the training process if there is no major improvement in the evaluation parameters.
 - **Evaluation Metric**: The performance measure.
   - For example, `r2` for regression models, precision for classification models. `auc` (Area under curve) because it performs well with the imbalanced data.
 - **Evaluation set**: `X_val` and `y_val` both are used for the evaluation purpose.
 
+### XGBoost Native API `xgboost.train()`
+
+- XGBoost comes with its own class for storing datasets called `DMatrix`.
+  - It is a highly optimized class for memory and speed and has the ability to internally deal with categoricals.
+  - That's why converting datasets into this format is a **requirement for the native XGBoost API**.
+
 ```Python
-clf_xgb = XGBClassifier(seed=42)
+import xgboost as xgb
+# Split the data
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=2025)
+
+# Extract categorical features
+cats = X.select_dtypes(exclude=np.number).columns.tolist()
+# Convert to Pandas category
+for col in cats:
+   X[col] = X[col].astype('category')
+
+# Create regression matrices
+dtrain_reg = xgb.DMatrix(X_train, y_train, enable_categorical=True)
+dtest_reg = xgb.DMatrix(X_test, y_test, enable_categorical=True)
+
+# Define hyperparameters
+params = {
+  "objective": "reg:squarederror",
+  "tree_method": "gpu_hist"
+}
+
+n = 100
+model = xgb.train(
+   params=params,
+   dtrain=dtrain_reg,
+   num_boost_round=n,
+)
+# Evaluation
+from sklearn.metrics import mean_squared_error
+
+preds = model.predict(dtest_reg)
+rmse = mean_squared_error(y_test, preds, squared=False)
+
+print(f"RMSE of the base model: {rmse:.3f}")
+```
+
+### XGBoost Scikit-Learn API: `xgboost.XGBRegressor`, `XGBClassifier`
+
+- XGBoost also offers `XGBClassifier` and `XGBRegressor` classes so that they can be integrated into the **Scikit-Learn** ecosystem
+
+```Python
+import xgboost as xgb
+
+# Train a model using the scikit-learn API
+clf_xgb = xgb.XGBClassifier(
+            n_estimators=100, objective='binary:logistic', tree_method='hist', eta=0.1, max_depth=3, enable_categorical=True
+)
+# can X_train without encoding
 clf_xgb.fit(X_train,
             y_train,
             verbose=False,
             early_stopping_rounds=10,
             eval_metric='auc',
             eval_set=[(X_val, y_val)])
+
+# Convert the model to a native API model
+model = clf_xgb.get_booster()
 ```
 
 ## Hyper-parameter Space
 
-- `n_estimators` number of trees
-  - The more trees you have, the more reliable your predictions will be.
+- `booster` [default=gbtree]: This parameter basically selects the type of model to run at each iteration, which gives 2 options
+  - `gbtree`: tree-based models
+  - `gblinear`: linear models.
+- `n_estimators` (for the Scikit-learn interface) number of trees (a.k.a `num_boost_round` for or the native XGBoost interface).
+  - The more trees you have, the more reliable your predictions will be, but need to use with `early_stopping_rounds` during `.fit()` to prevent overfitting.
   - How many trees should you pick?
     - Quick result: limit the number of trees to around 200.
-    - Model onlr runs once a week: up to 5,000 trees.
+    - Model only runs once a week: up to 5,000 trees.
 - `learning_rate` regulates how much each tree contributes to the final prediction. The more trees you have, the smaller the learning rate should be.
   - Range: between 0.001 and 0.1.
 - `max_depth` decides the complexity of each tree in your model & refers to the maximum depth that a tree can grow to.
