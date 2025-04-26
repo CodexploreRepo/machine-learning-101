@@ -20,21 +20,27 @@ lgb_model.fit(X_train_pre,
 
 ## Hyper-parameter Space
 
-- `num_iterations` number of trees
+- `num_boost_round` (`n_estimators`) number of trees
   - The more trees you have, the more stable your predictions will be
+  - **Tip**: Start small, around 100–500, and use early stopping to avoid overfitting.
   - How many trees should you choose:
     - If your model needs to deliver results with low latency, you might want to limit the number of trees to around 200.
     - If your model runs once a week (e.g.: sales forecasting) and has more time to make the predictions, you could consider using up to 5,000 trees
-- `learning_rate`
+- `learning_rate` controls how much each tree contributes to the final prediction.
   - Rule of thumb: start by fixing the number of trees and then focus on tuning the learning_rate
+  - **Tip**: Start with 0.1, then reduce to 0.01 or 0.001 for tougher problems.
   - The more trees you have, the smaller the learning rate should be.
   - Range: 0.001 and 0.1 (`trial.suggest_float("learning_rate", 1e-3, 0.1, log=True)`)
 - `num_leaves` maximum number of terminal nodes (leaves) that can be present in each tree.
-  - num_leaves is equivalent to `max_depth` parameter in other tree-based models
+  - **Tip**: A larger number improves accuracy but can lead to overfitting. Keep it close to `2^(max_depth)`.
   - In a decision tree, a leaf represents a decision or an outcome.
   - Range: powers of 2, starting from 2 and going up to 1024
   - Pros: By increasing the num_leaves, you allow the tree to grow more complex, creating a higher number of distinct decision paths.
   - Cons: increasing the number of leaves may also cause the model to **overfit** the training data, as it will have a lower amount of data per leaf.
+- `max_depth`: Limits the depth of the trees.
+  - **Tip**: Start with a range of 3-10, depending on your dataset’s complexity.
+- `feature_fraction` the fraction of features used in each tree.
+  - **Tip**: Start at 0.8 and decrease if you notice overfitting.
 - `subsample` control the amount of data used for building each tree in your model.
   - Range: a fraction that ranges from 0 to 1, representing the proportion of the dataset to be randomly selected for training each tree (Recommend: 0.05 and 1)
   - By using only a subset of the data for each tree, the model can benefit from the diversity and reduce the correlation between the trees, which may help combat overfitting.
