@@ -5,7 +5,7 @@
 ### Data Cleaning
 
 - [EDA](./docs/eda.md)
-- [Outlier Removal](./docs/outlier_removal.md)
+- [Outlier Detection & Treatment](./docs/outlier_detection_and_treatment.md)
 
 ### Data Pre-processing
 
